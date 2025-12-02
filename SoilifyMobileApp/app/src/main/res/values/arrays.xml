@@ -1,0 +1,19 @@
+<resources>
+    <string-array name="crop_types_placeholder">
+        <item>Wheat</item>
+        <item>Maize</item>
+        <item>Rice</item>
+    </string-array>
+
+    <string-array name="soil_types_placeholder">
+        <item>Loam</item>
+        <item>Clay</item>
+        <item>Sandy</item>
+    </string-array>
+
+    <string-array name="fertiliser_types_placeholder">
+        <item>NPK</item>
+        <item>Urea</item>
+        <item>DAP</item>
+    </string-array>
+</resources>

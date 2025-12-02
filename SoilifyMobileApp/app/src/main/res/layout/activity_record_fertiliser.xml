@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Record Usage"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#333"
+            android:layout_marginBottom="24dp"/>
+
+        <TextView android:text="Crop Type" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        <Spinner
+            android:id="@+id/spCropType"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:entries="@array/crop_types_placeholder"
+            android:background="@android:drawable/btn_dropdown"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView android:text="Soil Type" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        <Spinner
+            android:id="@+id/spSoilType"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:entries="@array/soil_types_placeholder"
+            android:background="@android:drawable/btn_dropdown"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView android:text="Fertiliser Used" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        <Spinner
+            android:id="@+id/spFertiliserType"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:entries="@array/fertiliser_types_placeholder"
+            android:background="@android:drawable/btn_dropdown"
+            android:layout_marginBottom="16dp"/>
+
+        <EditText
+            android:id="@+id/etAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Amount (kg)"
+            android:inputType="numberDecimal"
+            android:minHeight="48dp"
+            android:layout_marginBottom="16dp"/>
+
+        <EditText
+            android:id="@+id/etFarmSize"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Farm Size (hectares)"
+            android:inputType="numberDecimal"
+            android:minHeight="48dp"
+            android:layout_marginBottom="24dp"/>
+
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Submit Data"
+            android:backgroundTint="#2E7D32"/>
+
+    </LinearLayout>
+</ScrollView>
