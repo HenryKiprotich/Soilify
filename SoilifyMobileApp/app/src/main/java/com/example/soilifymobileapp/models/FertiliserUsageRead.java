@@ -35,5 +35,43 @@ public class FertiliserUsageRead {
     @SerializedName("created_at")
     private Date createdAt;
 
-    // Getters and Setters
+    public int getId() {
+        return id;
+    }
+
+    public int getFarmerId() {
+        return farmerId;
+    }
+
+    public int getFieldId() {
+        return fieldId;
+    }
+
+    public String getFieldName() {
+        return fieldName;
+    }
+
+    public String getFertiliserType() {
+        return fertiliserType;
+    }
+
+    public float getAmountKg() {
+        return amountKg;
+    }
+
+    public String getWeather() {
+        return weather;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
 }

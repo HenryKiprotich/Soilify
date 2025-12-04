@@ -13,12 +13,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.soilifymobileapp.R;
+import com.example.soilifymobileapp.adapters.AlertsAdapter;
+import com.example.soilifymobileapp.models.Alert;
 import com.example.soilifymobileapp.models.DashboardResponse;
 import com.example.soilifymobileapp.models.RecentAlert;
 import com.example.soilifymobileapp.network.ApiClient;
 import com.example.soilifymobileapp.network.HomeApi;
-import com.example.soilifymobileapp.ui.adapters.AlertsAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -69,7 +71,7 @@ public class DashboardActivity extends AppCompatActivity {
             // Navigate to weather screen
         });
         btnAlerts.setOnClickListener(v -> {
-            // Navigate to alerts screen
+            startActivity(new Intent(DashboardActivity.this, AlertsActivity.class));
         });
         btnAIAdvisor.setOnClickListener(v -> {
             // Navigate to AI chat screen
@@ -110,13 +112,12 @@ public class DashboardActivity extends AppCompatActivity {
         });
     }
 
-    private void setupAlertsList(List<RecentAlert> alerts) {
-        AlertsAdapter adapter = new AlertsAdapter(alerts, alert -> {
-            // Handle alert click
-            if (alert.getFieldId() != null) {
-                // navigateToField(alert.getFieldId());
-            }
-        });
+    private void setupAlertsList(List<RecentAlert> recentAlerts) {
+        List<Alert> alerts = new ArrayList<>();
+        for (RecentAlert recentAlert : recentAlerts) {
+            alerts.add(new Alert(recentAlert.getMessage(), recentAlert.getFieldName()));
+        }
+        AlertsAdapter adapter = new AlertsAdapter(this, alerts);
         recyclerAlerts.setAdapter(adapter);
     }
 }

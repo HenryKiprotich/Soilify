@@ -10,10 +10,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.soilifymobileapp.R;
+import com.example.soilifymobileapp.adapters.AlertsAdapter;
+import com.example.soilifymobileapp.models.Alert;
 import com.example.soilifymobileapp.models.AlertRead;
 import com.example.soilifymobileapp.network.ApiClient;
 import com.example.soilifymobileapp.network.AlertsApi;
-import com.example.soilifymobileapp.ui.adapters.AlertsAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,7 @@ public class AlertsActivity extends AppCompatActivity {
 
     private RecyclerView rvAlerts;
     private AlertsAdapter adapter;
-    private List<AlertRead> alertList = new ArrayList<>();
+    private List<Alert> alertList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +51,9 @@ public class AlertsActivity extends AppCompatActivity {
             public void onResponse(Call<List<AlertRead>> call, Response<List<AlertRead>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     alertList.clear();
-                    alertList.addAll(response.body());
+                    for (AlertRead alertRead : response.body()) {
+                        alertList.add(new Alert(alertRead.getMessage(), alertRead.getFieldName()));
+                    }
                     adapter.notifyDataSetChanged();
                 } else {
                     Toast.makeText(AlertsActivity.this, "Failed to load alerts", Toast.LENGTH_SHORT).show();

@@ -31,8 +31,8 @@ public class RecommendationsAdapter extends RecyclerView.Adapter<Recommendations
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Recommendation recommendation = recommendationList.get(position);
-        holder.tvTitle.setText(recommendation.getTitle());
-        holder.tvDescription.setText(recommendation.getDescription());
+        holder.tvTitle.setText(recommendation.getSender());
+        holder.tvDescription.setText(recommendation.getMessage());
     }
 
     @Override
