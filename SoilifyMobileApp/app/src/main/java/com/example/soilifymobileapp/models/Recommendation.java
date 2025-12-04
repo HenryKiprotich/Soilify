@@ -1,19 +1,19 @@
 package com.example.soilifymobileapp.models;
 
 public class Recommendation {
-    private String title;
-    private String description;
+    private String sender;
+    private String message;
 
-    public Recommendation(String title, String description) {
-        this.title = title;
-        this.description = description;
+    public Recommendation(String sender, String message) {
+        this.sender = sender;
+        this.message = message;
     }
 
-    public String getTitle() {
-        return title;
+    public String getSender() {
+        return sender;
     }
 
-    public String getDescription() {
-        return description;
+    public String getMessage() {
+        return message;
     }
 }

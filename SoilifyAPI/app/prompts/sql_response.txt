@@ -1,0 +1,14 @@
+The farmer asked: {question}
+
+The SQL query executed was:
+{sql_query}
+
+The results are:
+Columns: {columns}
+Rows: {rows}
+
+Please provide a clear, natural language answer to the farmer's question based on these results.
+Make it conversational and easy to understand. If there are many rows, summarize the key findings.
+If there are no results, explain that no data was found matching the criteria.
+
+Answer:

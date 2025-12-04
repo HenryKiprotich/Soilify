@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <Spinner
+        android:id="@+id/spField"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <EditText
+        android:id="@+id/etFertiliserType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Fertiliser Type" />
+
+    <EditText
+        android:id="@+id/etAmount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Amount (kg)"
+        android:inputType="numberDecimal" />
+
+    <EditText
+        android:id="@+id/etWeather"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Weather" />
+
+    <EditText
+        android:id="@+id/etNotes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Notes" />
+
+    <Button
+        android:id="@+id/btnSelectDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Date" />
+
+</LinearLayout>

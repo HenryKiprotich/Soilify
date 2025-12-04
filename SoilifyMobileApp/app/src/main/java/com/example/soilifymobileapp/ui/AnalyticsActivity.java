@@ -7,6 +7,10 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.soilifymobileapp.R;
+import com.example.soilifymobileapp.models.FarmOverview;
+import com.example.soilifymobileapp.models.FertilizerByType;
+import com.example.soilifymobileapp.network.AnalyticsApi;
+import com.example.soilifymobileapp.network.ApiClient;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
@@ -15,6 +19,11 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AnalyticsActivity extends AppCompatActivity {
 
@@ -32,8 +41,7 @@ public class AnalyticsActivity extends AppCompatActivity {
 
         // Setup the chart and load data
         setupBarChart();
-        loadChartData();
-        loadSummaryData();
+        loadAnalyticsData();
     }
 
     private void setupBarChart() {
@@ -62,37 +70,74 @@ public class AnalyticsActivity extends AppCompatActivity {
         barChart.getLegend().setEnabled(false);
     }
 
-    private void loadChartData() {
-        // Create sample data entries for the bar chart
+    private void loadAnalyticsData() {
+        AnalyticsApi apiService = ApiClient.getClient().create(AnalyticsApi.class);
+
+        // Fetch farm overview
+        Call<FarmOverview> farmOverviewCall = apiService.getFarmOverview();
+        farmOverviewCall.enqueue(new Callback<FarmOverview>() {
+            @Override
+            public void onResponse(Call<FarmOverview> call, Response<FarmOverview> response) {
+                if (response.isSuccessful()) {
+                    FarmOverview overview = response.body();
+                    if (overview != null) {
+                        String summary = "Total Fields: " + overview.getTotalFields() + "\n" +
+                                "Total Area: " + overview.getTotalAreaHectares() + " hectares\n" +
+                                "Most Used Fertilizer: " + overview.getFertilizerSummary().getMostUsedFertilizer();
+                        tvSummaryData.setText(summary);
+                    }
+                } else {
+                    // Handle error
+                }
+            }
+
+            @Override
+            public void onFailure(Call<FarmOverview> call, Throwable t) {
+                // Handle exception
+            }
+        });
+
+        // Fetch fertilizer by type
+        Call<List<FertilizerByType>> fertilizerByTypeCall = apiService.getFertilizerByType();
+        fertilizerByTypeCall.enqueue(new Callback<List<FertilizerByType>>() {
+            @Override
+            public void onResponse(Call<List<FertilizerByType>> call, Response<List<FertilizerByType>> response) {
+                if (response.isSuccessful()) {
+                    List<FertilizerByType> fertilizerData = response.body();
+                    if (fertilizerData != null) {
+                        updateBarChart(fertilizerData);
+                    }
+                } else {
+                    // Handle error
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<FertilizerByType>> call, Throwable t) {
+                // Handle exception
+            }
+        });
+    }
+
+    private void updateBarChart(List<FertilizerByType> fertilizerData) {
         ArrayList<BarEntry> entries = new ArrayList<>();
-        entries.add(new BarEntry(0, 40f)); // Nitrogen
-        entries.add(new BarEntry(1, 65f)); // Phosphorus
-        entries.add(new BarEntry(2, 55f)); // Potassium
+        ArrayList<String> labels = new ArrayList<>();
 
-        // Define labels for the X-axis
-        final String[] labels = new String[]{"Nitrogen", "Phosphorus", "Potassium"};
+        for (int i = 0; i < fertilizerData.size(); i++) {
+            entries.add(new BarEntry(i, fertilizerData.get(i).getTotalAmountKg()));
+            labels.add(fertilizerData.get(i).getFertiliserType());
+        }
 
-        // Create a data set from the entries
-        BarDataSet dataSet = new BarDataSet(entries, "Nutrient Levels");
+        BarDataSet dataSet = new BarDataSet(entries, "Fertilizer Usage (kg)");
         dataSet.setColors(Color.rgb(104, 241, 175), Color.rgb(255, 208, 140), Color.rgb(140, 234, 255));
         dataSet.setValueTextColor(Color.BLACK);
         dataSet.setValueTextSize(12f);
 
-        // Create BarData object and set it to the chart
         BarData barData = new BarData(dataSet);
         barChart.setData(barData);
 
-        // Apply the labels to the X-axis
         barChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(labels));
 
-        // Refresh the chart to display the new data
         barChart.invalidate();
-    }
-
-    private void loadSummaryData() {
-        // This is a placeholder for where you might calculate or fetch summary data.
-        // For example, you could average the nutrient levels.
-        String summary = "Phosphorus levels are optimal. Nitrogen is slightly low. Consider adding a nitrogen-rich fertilizer.";
-        tvSummaryData.setText(summary);
     }
 }

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/etFieldName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Field Name" />
+
+    <EditText
+        android:id="@+id/etSoilType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Soil Type" />
+
+    <EditText
+        android:id="@+id/etCropType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Crop Type" />
+
+    <EditText
+        android:id="@+id/etSize"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Size (hectares)" />
+
+</LinearLayout>
