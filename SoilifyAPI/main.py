@@ -8,9 +8,10 @@ from dotenv import load_dotenv
 # Load environment variables from .env file FIRST before any other imports
 load_dotenv()
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 import logging
+import time
 
 # Set up logging
 logging.basicConfig(
@@ -18,6 +19,10 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+# Also configure uvicorn loggers to show access logs
+logging.getLogger("uvicorn.access").setLevel(logging.INFO)
+logging.getLogger("uvicorn.error").setLevel(logging.INFO)
 
 # Import all routers
 from app.api.auth import router as auth_router
@@ -53,6 +58,26 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Request logging middleware
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    """Log all incoming requests and their response times"""
+    start_time = time.time()
+    
+    # Log the incoming request
+    logger.info(f"➡️  {request.method} {request.url.path}")
+    
+    # Process the request
+    response = await call_next(request)
+    
+    # Calculate processing time
+    process_time = time.time() - start_time
+    
+    # Log the response
+    logger.info(f"⬅️  {request.method} {request.url.path} - Status: {response.status_code} - Time: {process_time:.3f}s")
+    
+    return response
 
 # Include all routers
 app.include_router(auth_router, prefix="/api/auth", tags=["Authentication"])
@@ -125,5 +150,6 @@ if __name__ == "__main__":
         host="0.0.0.0",
         port=8000,
         reload=True,
-        log_level="info"
+        log_level="info",
+        access_log=True  # Ensure access logs are enabled
     )

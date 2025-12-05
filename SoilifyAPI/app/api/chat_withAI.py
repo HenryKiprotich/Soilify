@@ -32,7 +32,7 @@ llm_manager = LLMManager()
 @router.post("/chat", response_model=ChatResponse)
 async def chat_with_ai(
     request: ChatRequest,
-    farmer_id: int = Depends(get_current_user_from_cookie),
+    current_user: dict = Depends(get_current_user_from_cookie),
     db: AsyncSession = Depends(get_db)
 ):
     """
@@ -43,6 +43,10 @@ async def chat_with_ai(
     - **context**: Optional additional context for the conversation
     """
     try:
+        farmer_id = current_user["user_id"]
+        logger.info(f"Chat request received from farmer_id: {farmer_id}")
+        logger.info(f"Message: {request.message}")
+        
         # Generate session_id if not provided
         session_id = request.session_id or str(uuid.uuid4())
 
@@ -63,7 +67,7 @@ async def chat_with_ai(
         )
 
     except Exception as e:
-        logger.error(f"Error in chat endpoint: {e}")
+        logger.exception(f"Error in chat endpoint: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to process chat request: {str(e)}"
@@ -73,7 +77,7 @@ async def chat_with_ai(
 @router.post("/ask-sql", response_model=NLToSQLResponse)
 async def ask_with_sql(
     request: NLToSQLRequest,
-    farmer_id: int = Depends(get_current_user_from_cookie),
+    current_user: dict = Depends(get_current_user_from_cookie),
     db: AsyncSession = Depends(get_db)
 ):
     """
@@ -86,6 +90,9 @@ async def ask_with_sql(
     - **session_id**: Optional session ID for tracking
     """
     try:
+        farmer_id = current_user["user_id"]
+        logger.info(f"SQL query request from farmer_id: {farmer_id}")
+        
         # Generate session_id if not provided
         session_id = request.session_id or str(uuid.uuid4())
 
@@ -124,7 +131,7 @@ async def ask_with_sql(
 async def analyze_field(
     field_id: int,
     session_id: Optional[str] = None,
-    farmer_id: int = Depends(get_current_user_from_cookie),
+    current_user: dict = Depends(get_current_user_from_cookie),
     db: AsyncSession = Depends(get_db)
 ):
     """
@@ -137,6 +144,7 @@ async def analyze_field(
     - **session_id**: Optional session ID for tracking
     """
     try:
+        farmer_id = current_user["user_id"]
         # Generate session_id if not provided
         session_id = session_id or str(uuid.uuid4())
 
@@ -173,7 +181,7 @@ async def analyze_field(
 @router.get("/history/{session_id}", response_model=ConversationHistory)
 async def get_conversation_history(
     session_id: str,
-    farmer_id: int = Depends(get_current_user_from_cookie),
+    current_user: dict = Depends(get_current_user_from_cookie),
     db: AsyncSession = Depends(get_db)
 ):
     """
@@ -182,6 +190,7 @@ async def get_conversation_history(
     - **session_id**: The session ID to retrieve history for
     """
     try:
+        farmer_id = current_user["user_id"]
         # Query conversation history
         query = text("""
             SELECT 
@@ -237,13 +246,14 @@ async def get_conversation_history(
 
 @router.get("/sessions")
 async def get_user_sessions(
-    farmer_id: int = Depends(get_current_user_from_cookie),
+    current_user: dict = Depends(get_current_user_from_cookie),
     db: AsyncSession = Depends(get_db)
 ):
     """
     Get all conversation sessions for the authenticated farmer
     """
     try:
+        farmer_id = current_user["user_id"]
         query = text("""
             SELECT 
                 session_id,

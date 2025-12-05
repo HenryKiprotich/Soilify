@@ -30,7 +30,7 @@ class LLMManager:
             raise ValueError("GOOGLE_API_KEY environment variable not set")
 
         genai.configure(api_key=api_key)
-        self.model_name = "gemini-1.5-flash"
+        self.model_name = "gemini-2.0-flash"
         self.model = genai.GenerativeModel(self.model_name)
 
         # Load prompt templates
@@ -176,31 +176,35 @@ Provide a helpful, clear response:
         """Convert natural language question to SQL query and execute it"""
         try:
             # Get database schema relevant to the farmer
+            # Note: Table names are PascalCase and must be quoted in PostgreSQL
             schema = f"""
-Database Schema:
-- users: id, first_name, other_name, phone_number, email_adress, location, created_at
-- fields: id, farmer_id, field_name, soil_type, crop_type, size_hectares, created_at
-- fertiliserusage: id, farmer_id, field_id, fertiliser_type, amount_kg, weather, notes, date, created_at
-- weatherdata: id, field_id, temperature, rainfall, soil_moisture, created_at
-- alerts: id, farmer_id, field_id, message, created_at
+Database Schema (PostgreSQL - table names are case-sensitive and must be quoted):
+- "Users": id, first_name, other_name, phone_number, email_adress, location, created_at
+- "Fields": id, farmer_id, field_name, soil_type, crop_type, size_hectares, created_at
+- "FertiliserUsage": id, farmer_id, field_id, fertiliser_type, amount_kg, weather, notes, date, created_at
+- "WeatherData": id, field_id, temperature, rainfall, soil_moisture, created_at
+- "Alerts": id, farmer_id, field_id, message, created_at
 
-Important: All queries MUST filter by farmer_id = {farmer_id} to ensure data security.
+Important: 
+- All table names MUST be quoted with double quotes (e.g., "Fields", "Users")
+- All queries MUST filter by farmer_id = {farmer_id} to ensure data security.
 """
 
             # Build prompt for SQL generation
             prompt_template = self.prompts.get("nl_to_sql", """
-You are an expert SQL query generator for a farming database.
+You are an expert SQL query generator for a farming database using PostgreSQL.
 
 {schema}
 
 Generate a SQL SELECT query to answer this question: {question}
 
 Rules:
-1. ALWAYS include WHERE farmer_id = {farmer_id} in queries involving farmer-specific tables
-2. Use proper JOINs when needed
-3. Return only the SQL query, no explanations
-4. Use PostgreSQL syntax
-5. The query should be safe (no DELETE, UPDATE, DROP, etc.)
+1. ALWAYS quote table names with double quotes (e.g., SELECT * FROM "Fields")
+2. ALWAYS include WHERE farmer_id = {farmer_id} in queries involving farmer-specific tables
+3. Use proper JOINs when needed
+4. Return ONLY the SQL query, no explanations or markdown
+5. Use PostgreSQL syntax
+6. The query should be safe (no DELETE, UPDATE, DROP, etc.)
 
 SQL Query:
 """)

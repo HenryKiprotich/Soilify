@@ -5,7 +5,8 @@ Only allows SELECT statements for security
 
 import asyncpg
 import logging
-import os
+
+from app.config.settings import settings
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -16,9 +17,9 @@ class SQLExecutor:
     
     def __init__(self, db_url: str = None):
         """Initialize with database URL"""
-        self.db_url = db_url or os.getenv("DATABASE_URL")
+        self.db_url = db_url or settings.DATABASE_URL
         if not self.db_url:
-            raise ValueError("DATABASE_URL not provided or set in environment")
+            raise ValueError("DATABASE_URL not provided or set in settings")
         logger.info("SQLExecutor initialized")
     
     def _validate_query(self, sql: str) -> None:

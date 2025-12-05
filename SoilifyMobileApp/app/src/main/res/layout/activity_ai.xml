@@ -5,10 +5,97 @@
     android:layout_height="match_parent"
     tools:context=".ui.AIActivity">
 
+    <!-- Mode Selection and Field Spinner at the top -->
+    <LinearLayout
+        android:id="@+id/layout_mode_selection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <!-- Mode Toggle Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/btnModeChat"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                android:text="Chat"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/btnModeQuery"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:text="Query Data"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/btnModeAnalyze"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                android:text="Analyze Field"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Field Selection (visible only for Analyze mode) -->
+        <LinearLayout
+            android:id="@+id/layout_field_selection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Select Field: "
+                android:textSize="14sp" />
+
+            <Spinner
+                android:id="@+id/spinnerFields"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/btnAnalyzeField"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Analyze"
+                android:layout_marginStart="8dp" />
+        </LinearLayout>
+
+        <!-- Current Mode Hint -->
+        <TextView
+            android:id="@+id/tvModeHint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ask me anything about farming!"
+            android:textSize="12sp"
+            android:textStyle="italic"
+            android:gravity="center"
+            android:layout_marginTop="4dp" />
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvConversations"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/layout_mode_selection"
         android:layout_above="@+id/layout_chatbox" />
 
     <LinearLayout
@@ -16,14 +103,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:padding="8dp">
 
         <EditText
             android:id="@+id/etChatMessage"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="Enter message" />
+            android:hint="Enter message"
+            android:inputType="textMultiLine"
+            android:maxLines="3" />
 
         <Button
             android:id="@+id/btnSendMessage"
