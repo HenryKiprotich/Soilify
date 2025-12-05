@@ -191,7 +191,7 @@ async def get_conversation_history(
                 model,
                 metadata,
                 created_at
-            FROM ai_conversations
+            FROM "AIConversations"
             WHERE farmer_id = :farmer_id AND session_id = :session_id
             ORDER BY created_at ASC
         """)
@@ -250,7 +250,7 @@ async def get_user_sessions(
                 COUNT(*) as message_count,
                 MAX(created_at) as last_message,
                 MIN(created_at) as first_message
-            FROM ai_conversations
+            FROM "AIConversations"
             WHERE farmer_id = :farmer_id
             GROUP BY session_id
             ORDER BY MAX(created_at) DESC

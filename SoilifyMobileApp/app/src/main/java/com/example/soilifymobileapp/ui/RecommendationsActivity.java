@@ -1,7 +1,5 @@
 package com.example.soilifymobileapp.ui;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -28,11 +26,10 @@ import retrofit2.Response;
 
 public class RecommendationsActivity extends AppCompatActivity {
 
-    private RecyclerView rvRecommendations;
     private RecommendationsAdapter adapter;
-    private List<Recommendation> recommendationList = new ArrayList<>();
+    private final List<Recommendation> recommendationList = new ArrayList<>();
     private EditText etChatMessage;
-    private Button btnSendMessage;
+    private RecyclerView rvRecommendations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +38,7 @@ public class RecommendationsActivity extends AppCompatActivity {
 
         rvRecommendations = findViewById(R.id.rvRecommendations);
         etChatMessage = findViewById(R.id.etChatMessage);
-        btnSendMessage = findViewById(R.id.btnSendMessage);
+        Button btnSendMessage = findViewById(R.id.btnSendMessage);
 
         rvRecommendations.setLayoutManager(new LinearLayoutManager(this));
         adapter = new RecommendationsAdapter(this, recommendationList);
@@ -56,7 +53,7 @@ public class RecommendationsActivity extends AppCompatActivity {
     }
 
     private void getAiRecommendation(String message) {
-        AiApi aiApi = ApiClient.getClient(getToken()).create(AiApi.class);
+        AiApi aiApi = ApiClient.getClient(this).create(AiApi.class);
         ChatRequest chatRequest = new ChatRequest(message, null, null);
 
         recommendationList.add(new Recommendation("You", message));
@@ -70,7 +67,10 @@ public class RecommendationsActivity extends AppCompatActivity {
                     String aiResponse = response.body().getResponse();
                     recommendationList.add(new Recommendation("AI", aiResponse));
                     adapter.notifyDataSetChanged();
-                    rvRecommendations.smoothScrollToPosition(recommendationList.size() - 1);
+                    // Smooth scroll to the last item
+                    if (adapter.getItemCount() > 0) {
+                        rvRecommendations.smoothScrollToPosition(adapter.getItemCount() - 1);
+                    }
                 } else {
                     Toast.makeText(RecommendationsActivity.this, "Failed to get recommendation", Toast.LENGTH_SHORT).show();
                 }
@@ -81,10 +81,5 @@ public class RecommendationsActivity extends AppCompatActivity {
                 Toast.makeText(RecommendationsActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private String getToken() {
-        SharedPreferences sharedPreferences = getSharedPreferences("auth", Context.MODE_PRIVATE);
-        return sharedPreferences.getString("token", null);
     }
 }

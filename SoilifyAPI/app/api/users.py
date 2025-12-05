@@ -22,7 +22,7 @@ async def get_users(db: AsyncSession = Depends(get_db)):
             email_adress, 
             location, 
             created_at
-        FROM users
+        FROM "Users"
         ORDER BY created_at DESC
     """)
     

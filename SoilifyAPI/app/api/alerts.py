@@ -34,7 +34,7 @@ async def get_fields_for_dropdown(
             soil_type, 
             crop_type, 
             size_hectares
-        FROM fields
+        FROM "Fields"
         WHERE farmer_id = :farmer_id
         ORDER BY field_name ASC
     """)
@@ -79,9 +79,9 @@ async def get_all_alerts(
                 f.field_name,
                 a.message,
                 a.created_at
-            FROM alerts a
-            INNER JOIN users u ON a.farmer_id = u.id
-            LEFT JOIN fields f ON a.field_id = f.id
+            FROM "Alerts" a
+            INNER JOIN "Users" u ON a.farmer_id = u.id
+            LEFT JOIN "Fields" f ON a.field_id = f.id
             WHERE a.farmer_id = :farmer_id AND a.field_id = :field_id
             ORDER BY a.created_at DESC
             LIMIT :limit
@@ -97,9 +97,9 @@ async def get_all_alerts(
                 f.field_name,
                 a.message,
                 a.created_at
-            FROM alerts a
-            INNER JOIN users u ON a.farmer_id = u.id
-            LEFT JOIN fields f ON a.field_id = f.id
+            FROM "Alerts" a
+            INNER JOIN "Users" u ON a.farmer_id = u.id
+            LEFT JOIN "Fields" f ON a.field_id = f.id
             WHERE a.farmer_id = :farmer_id
             ORDER BY a.created_at DESC
             LIMIT :limit
@@ -135,14 +135,14 @@ async def get_alerts_summary(
     
     # Get total alerts
     total_query = text("""
-        SELECT COUNT(*) FROM alerts WHERE farmer_id = :farmer_id
+        SELECT COUNT(*) FROM "Alerts" WHERE farmer_id = :farmer_id
     """)
     total_result = await db.execute(total_query, {"farmer_id": farmer_id})
     total_alerts = total_result.fetchone()[0]
     
     # Get alerts today
     today_query = text("""
-        SELECT COUNT(*) FROM alerts 
+        SELECT COUNT(*) FROM "Alerts" 
         WHERE farmer_id = :farmer_id 
         AND DATE(created_at) = CURRENT_DATE
     """)
@@ -151,7 +151,7 @@ async def get_alerts_summary(
     
     # Get alerts this week
     week_query = text("""
-        SELECT COUNT(*) FROM alerts 
+        SELECT COUNT(*) FROM "Alerts" 
         WHERE farmer_id = :farmer_id 
         AND created_at >= CURRENT_DATE - INTERVAL '7 days'
     """)
@@ -163,8 +163,8 @@ async def get_alerts_summary(
         SELECT 
             COALESCE(f.field_name, 'General') AS field_name,
             COUNT(a.id) AS alert_count
-        FROM alerts a
-        LEFT JOIN fields f ON a.field_id = f.id
+        FROM "Alerts" a
+        LEFT JOIN "Fields" f ON a.field_id = f.id
         WHERE a.farmer_id = :farmer_id
         GROUP BY f.field_name
         ORDER BY alert_count DESC
@@ -202,9 +202,9 @@ async def get_alert(
             f.field_name,
             a.message,
             a.created_at
-        FROM alerts a
-        INNER JOIN users u ON a.farmer_id = u.id
-        LEFT JOIN fields f ON a.field_id = f.id
+        FROM "Alerts" a
+        INNER JOIN "Users" u ON a.farmer_id = u.id
+        LEFT JOIN "Fields" f ON a.field_id = f.id
         WHERE a.id = :alert_id AND a.farmer_id = :farmer_id
     """)
     
@@ -244,7 +244,7 @@ async def create_alert(
     field_name = None
     if alert.field_id:
         check_field_query = text("""
-            SELECT id, field_name FROM fields 
+            SELECT id, field_name FROM "Fields" 
             WHERE id = :field_id AND farmer_id = :farmer_id
         """)
         field_result = await db.execute(
@@ -263,14 +263,14 @@ async def create_alert(
     # Get farmer name
     farmer_query = text("""
         SELECT first_name || ' ' || COALESCE(other_name, '') AS farmer_name 
-        FROM users WHERE id = :farmer_id
+        FROM "Users" WHERE id = :farmer_id
     """)
     farmer_result = await db.execute(farmer_query, {"farmer_id": farmer_id})
     farmer_name = farmer_result.fetchone()[0]
     
     # Insert the new alert
     insert_query = text("""
-        INSERT INTO alerts (farmer_id, field_id, message)
+        INSERT INTO "Alerts" (farmer_id, field_id, message)
         VALUES (:farmer_id, :field_id, :message)
         RETURNING id, farmer_id, field_id, message, created_at
     """)
@@ -313,7 +313,7 @@ async def update_alert(
     
     # Check if alert exists and belongs to the farmer
     check_query = text("""
-        SELECT id FROM alerts 
+        SELECT id FROM "Alerts" 
         WHERE id = :alert_id AND farmer_id = :farmer_id
     """)
     check_result = await db.execute(check_query, {"alert_id": alert_id, "farmer_id": farmer_id})
@@ -327,7 +327,7 @@ async def update_alert(
     # If field_id is being updated, verify it belongs to the farmer
     if alert_update.field_id is not None:
         check_field_query = text("""
-            SELECT id FROM fields 
+            SELECT id FROM "Fields" 
             WHERE id = :field_id AND farmer_id = :farmer_id
         """)
         field_result = await db.execute(
@@ -360,7 +360,7 @@ async def update_alert(
     
     # Execute update and return updated record
     update_query = text(f"""
-        UPDATE alerts 
+        UPDATE "Alerts" 
         SET {', '.join(update_fields)}
         WHERE id = :alert_id AND farmer_id = :farmer_id
         RETURNING id, farmer_id, field_id, message, created_at
@@ -376,8 +376,8 @@ async def update_alert(
         SELECT 
             u.first_name || ' ' || COALESCE(u.other_name, '') AS farmer_name,
             f.field_name
-        FROM users u
-        LEFT JOIN fields f ON f.id = :field_id
+        FROM "Users" u
+        LEFT JOIN "Fields" f ON f.id = :field_id
         WHERE u.id = :farmer_id
     """)
     details_result = await db.execute(details_query, {"farmer_id": row[1], "field_id": row[2]})
@@ -407,7 +407,7 @@ async def delete_alert(
     
     # Check if alert exists and belongs to the farmer
     check_query = text("""
-        SELECT id FROM alerts 
+        SELECT id FROM "Alerts" 
         WHERE id = :alert_id AND farmer_id = :farmer_id
     """)
     check_result = await db.execute(check_query, {"alert_id": alert_id, "farmer_id": farmer_id})
@@ -420,7 +420,7 @@ async def delete_alert(
     
     # Delete the alert
     delete_query = text("""
-        DELETE FROM alerts 
+        DELETE FROM "Alerts" 
         WHERE id = :alert_id AND farmer_id = :farmer_id
     """)
     
@@ -452,7 +452,7 @@ async def bulk_delete_alerts(
     
     # Delete alerts that belong to the farmer
     delete_query = text(f"""
-        DELETE FROM alerts 
+        DELETE FROM "Alerts" 
         WHERE id IN ({ids_placeholder}) AND farmer_id = :farmer_id
     """)
     

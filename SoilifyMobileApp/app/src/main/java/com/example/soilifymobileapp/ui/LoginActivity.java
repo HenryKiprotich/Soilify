@@ -49,7 +49,14 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loginUser(String email, String password) {
-        AuthApi authApi = ApiClient.getClient().create(AuthApi.class);
+        // Validate inputs
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(LoginActivity.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Use getClientNoAuth() for login since we don't have a token yet
+        AuthApi authApi = ApiClient.getClientNoAuth().create(AuthApi.class);
         UserLogin userLogin = new UserLogin(email, null, password);
 
         Call<Token> call = authApi.signin(userLogin);
@@ -57,10 +64,18 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<Token> call, Response<Token> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    saveToken(response.body().getAccessToken());
-                    Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
-                    finish();
+                    Token tokenResponse = response.body();
+                    // The API now returns the token in access_token field
+                    String accessToken = tokenResponse.getAccessToken();
+                    
+                    if (accessToken != null && !accessToken.isEmpty()) {
+                        saveToken(accessToken);
+                        Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
+                        finish();
+                    } else {
+                        Toast.makeText(LoginActivity.this, "Login failed: No token received", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
                     Toast.makeText(LoginActivity.this, "Invalid credentials", Toast.LENGTH_SHORT).show();
                 }
@@ -68,7 +83,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<Token> call, Throwable t) {
-                Toast.makeText(LoginActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -78,5 +93,13 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("token", token);
         editor.apply();
+    }
+
+    /**
+     * Helper method to retrieve saved token
+     */
+    public static String getToken(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("auth", Context.MODE_PRIVATE);
+        return sharedPreferences.getString("token", null);
     }
 }

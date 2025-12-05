@@ -35,7 +35,7 @@ android {
         getByName("debug") {
             // This is automatically created, but we configure it here
             // Define the development/testing URL for the "debug" version
-            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080/\"")
+            buildConfigField("String", "BASE_URL", "\"http://192.168.100.8:8000/\"")
         }
     }
 

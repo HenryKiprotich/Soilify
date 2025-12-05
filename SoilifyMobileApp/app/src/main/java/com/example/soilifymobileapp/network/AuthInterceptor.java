@@ -1,5 +1,8 @@
 package com.example.soilifymobileapp.network;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import java.io.IOException;
 
 import okhttp3.Interceptor;
@@ -8,10 +11,10 @@ import okhttp3.Response;
 
 public class AuthInterceptor implements Interceptor {
 
-    private String token;
+    private Context context;
 
-    public AuthInterceptor(String token) {
-        this.token = token;
+    public AuthInterceptor(Context context) {
+        this.context = context;
     }
 
     @Override
@@ -19,7 +22,11 @@ public class AuthInterceptor implements Interceptor {
         Request originalRequest = chain.request();
         Request.Builder builder = originalRequest.newBuilder();
 
-        if (token != null) {
+        // Get token from SharedPreferences
+        SharedPreferences sharedPreferences = context.getSharedPreferences("auth", Context.MODE_PRIVATE);
+        String token = sharedPreferences.getString("token", null);
+
+        if (token != null && !token.isEmpty()) {
             builder.header("Authorization", "Bearer " + token);
         }
 

@@ -1,7 +1,5 @@
 package com.example.soilifymobileapp.ui;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,19 +32,17 @@ import retrofit2.Response;
 
 public class WeatherDataActivity extends AppCompatActivity {
 
-    private RecyclerView recyclerViewWeather;
-    private FloatingActionButton fabAddWeather;
     private WeatherDataAdapter adapter;
-    private List<WeatherDataRead> weatherDataList = new ArrayList<>();
-    private List<FieldOption> fieldOptions = new ArrayList<>();
+    private final List<WeatherDataRead> weatherDataList = new ArrayList<>();
+    private final List<FieldOption> fieldOptions = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather_data);
 
-        recyclerViewWeather = findViewById(R.id.recyclerViewWeather);
-        fabAddWeather = findViewById(R.id.fabAddWeather);
+        RecyclerView recyclerViewWeather = findViewById(R.id.recyclerViewWeather);
+        FloatingActionButton fabAddWeather = findViewById(R.id.fabAddWeather);
 
         recyclerViewWeather.setLayoutManager(new LinearLayoutManager(this));
         adapter = new WeatherDataAdapter(weatherDataList, new WeatherDataAdapter.OnItemClickListener() {
@@ -69,7 +65,7 @@ public class WeatherDataActivity extends AppCompatActivity {
     }
 
     private void loadWeatherData() {
-        WeatherApi weatherApi = ApiClient.getClient(getToken()).create(WeatherApi.class);
+        WeatherApi weatherApi = ApiClient.getClient(this).create(WeatherApi.class);
         Call<List<WeatherDataRead>> call = weatherApi.getAllWeatherData(null);
         call.enqueue(new Callback<List<WeatherDataRead>>() {
             @Override
@@ -91,7 +87,7 @@ public class WeatherDataActivity extends AppCompatActivity {
     }
 
     private void loadFieldOptions() {
-        WeatherApi weatherApi = ApiClient.getClient(getToken()).create(WeatherApi.class);
+        WeatherApi weatherApi = ApiClient.getClient(this).create(WeatherApi.class);
         Call<List<FieldOption>> call = weatherApi.getFieldsForDropdown();
         call.enqueue(new Callback<List<FieldOption>>() {
             @Override
@@ -157,7 +153,7 @@ public class WeatherDataActivity extends AppCompatActivity {
     }
 
     private void createWeatherData(WeatherDataCreate newWeatherData) {
-        WeatherApi weatherApi = ApiClient.getClient(getToken()).create(WeatherApi.class);
+        WeatherApi weatherApi = ApiClient.getClient(this).create(WeatherApi.class);
         Call<WeatherDataRead> call = weatherApi.createWeatherData(newWeatherData);
         call.enqueue(new Callback<WeatherDataRead>() {
             @Override
@@ -178,7 +174,7 @@ public class WeatherDataActivity extends AppCompatActivity {
     }
 
     private void updateWeatherData(int weatherId, WeatherDataUpdate updatedWeatherData) {
-        WeatherApi weatherApi = ApiClient.getClient(getToken()).create(WeatherApi.class);
+        WeatherApi weatherApi = ApiClient.getClient(this).create(WeatherApi.class);
         Call<WeatherDataRead> call = weatherApi.updateWeatherData(weatherId, updatedWeatherData);
         call.enqueue(new Callback<WeatherDataRead>() {
             @Override
@@ -199,7 +195,7 @@ public class WeatherDataActivity extends AppCompatActivity {
     }
 
     private void deleteWeatherData(int weatherId) {
-        WeatherApi weatherApi = ApiClient.getClient(getToken()).create(WeatherApi.class);
+        WeatherApi weatherApi = ApiClient.getClient(this).create(WeatherApi.class);
         Call<Void> call = weatherApi.deleteWeatherData(weatherId);
         call.enqueue(new Callback<Void>() {
             @Override
@@ -217,10 +213,5 @@ public class WeatherDataActivity extends AppCompatActivity {
                 Toast.makeText(WeatherDataActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private String getToken() {
-        SharedPreferences sharedPreferences = getSharedPreferences("auth", Context.MODE_PRIVATE);
-        return sharedPreferences.getString("token", null);
     }
 }

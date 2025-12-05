@@ -4,8 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.GridLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -62,24 +62,25 @@ public class DashboardActivity extends AppCompatActivity {
 
         // Button listeners
         btnMyFields.setOnClickListener(v -> {
-            // Navigate to fields screen
+            startActivity(new Intent(DashboardActivity.this, AnalyticsActivity.class));
         });
         btnFertilizerUsage.setOnClickListener(v -> {
-            // Navigate to fertilizer screen
+            startActivity(new Intent(DashboardActivity.this, RecordFertiliserActivity.class));
         });
         btnWeatherData.setOnClickListener(v -> {
-            // Navigate to weather screen
+            // There is no WeatherDataActivity yet, so this button does nothing.
         });
         btnAlerts.setOnClickListener(v -> {
             startActivity(new Intent(DashboardActivity.this, AlertsActivity.class));
         });
         btnAIAdvisor.setOnClickListener(v -> {
-            // Navigate to AI chat screen
+            startActivity(new Intent(DashboardActivity.this, RecommendationsActivity.class));
         });
     }
 
     private void loadDashboard() {
-        HomeApi apiService = ApiClient.getClient().create(HomeApi.class);
+        // Use getClient(context) to automatically include authentication token
+        HomeApi apiService = ApiClient.getClient(this).create(HomeApi.class);
         Call<DashboardResponse> call = apiService.getDashboard();
         call.enqueue(new Callback<DashboardResponse>() {
             @Override
@@ -101,15 +102,36 @@ public class DashboardActivity extends AppCompatActivity {
                         layoutEmptyState.setVisibility(dashboard.isHasFields() ? View.GONE : View.VISIBLE);
                     }
                 } else {
-                    // Handle error
+                    // Handle error - could be 401 Unauthorized
+                    Toast.makeText(DashboardActivity.this, 
+                        "Failed to load dashboard: " + response.code(), 
+                        Toast.LENGTH_SHORT).show();
+                    
+                    // If 401, redirect to login
+                    if (response.code() == 401) {
+                        redirectToLogin();
+                    }
                 }
             }
 
             @Override
             public void onFailure(Call<DashboardResponse> call, Throwable t) {
-                // Handle exception
+                // Handle network exception
+                Toast.makeText(DashboardActivity.this, 
+                    "Network error: " + t.getMessage(), 
+                    Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void redirectToLogin() {
+        // Clear saved token
+        getSharedPreferences("auth", MODE_PRIVATE).edit().clear().apply();
+        // Redirect to login
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private void setupAlertsList(List<RecentAlert> recentAlerts) {

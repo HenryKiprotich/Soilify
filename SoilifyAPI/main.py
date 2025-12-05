@@ -3,6 +3,11 @@ Soilify API - Farming Management System
 Main FastAPI application with all endpoints for Android app
 """
 
+from dotenv import load_dotenv
+
+# Load environment variables from .env file FIRST before any other imports
+load_dotenv()
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import logging

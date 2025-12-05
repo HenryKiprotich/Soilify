@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from passlib.context import CryptContext
 from jose import jwt, JWTError
-from fastapi import Depends, HTTPException, status, Cookie
+from fastapi import Depends, HTTPException, status, Cookie, Header
 
 from app.config.settings import settings
 
@@ -58,22 +58,34 @@ def decode_access_token(token: str):
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-async def get_current_user_from_cookie(token: str = Cookie(None)) -> dict:
+async def get_current_user_from_cookie(token: str = Cookie(None), authorization: str = Header(None)) -> dict:
     """
-    Extracts user_id from the JWT stored in an HttpOnly cookie.
+    Extracts user_id from the JWT stored in an HttpOnly cookie OR Authorization header.
+    Supports both cookie-based and header-based authentication for mobile apps.
+    
     Args:
         token (str): JWT token retrieved from the cookie.
+        authorization (str): JWT token from Authorization header.
     Returns:
         dict: A dictionary containing the user_id.
     Raises:
         HTTPException: If token is missing or invalid.
     """
-    if token is None:
+    # Try to get token from Authorization header first (for mobile apps)
+    jwt_token = None
+    if authorization and authorization.startswith("Bearer "):
+        jwt_token = authorization.split(" ")[1]
+    # Fallback to cookie if no Authorization header
+    elif token:
+        jwt_token = token
+    
+    if jwt_token is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authenticated: token cookie missing"
+            detail="Not authenticated: token missing from both cookie and Authorization header"
         )
-    payload = decode_access_token(token)
+    
+    payload = decode_access_token(jwt_token)
     user_id = payload.get("sub")
     if user_id is None:
         raise HTTPException(

@@ -3,7 +3,7 @@ from sqlalchemy.sql import func
 from app.database.database import Base
 
 class WeatherData(Base):
-    __tablename__ = "weatherdata"
+    __tablename__ = "WeatherData"
 
     id = Column("id", Integer, primary_key=True, index=True)
     field_id = Column("field_id", Integer, ForeignKey("fields.id"), nullable=False)

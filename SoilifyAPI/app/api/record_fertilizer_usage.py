@@ -32,7 +32,7 @@ async def get_fields_for_dropdown(
             soil_type, 
             crop_type, 
             size_hectares
-        FROM fields
+        FROM "Fields"
         WHERE farmer_id = :farmer_id
         ORDER BY field_name ASC
     """)
@@ -75,8 +75,8 @@ async def get_all_fertiliser_usage(
             fu.notes,
             fu.date,
             fu.created_at
-        FROM fertiliserusage fu
-        LEFT JOIN fields f ON fu.field_id = f.id
+        FROM "FertiliserUsage" fu
+        LEFT JOIN "Fields" f ON fu.field_id = f.id
         WHERE fu.farmer_id = :farmer_id
         ORDER BY fu.date DESC, fu.created_at DESC
     """)
@@ -125,8 +125,8 @@ async def get_fertiliser_usage(
             fu.notes,
             fu.date,
             fu.created_at
-        FROM fertiliserusage fu
-        LEFT JOIN fields f ON fu.field_id = f.id
+        FROM "FertiliserUsage" fu
+        LEFT JOIN "Fields" f ON fu.field_id = f.id
         WHERE fu.id = :usage_id AND fu.farmer_id = :farmer_id
     """)
     
@@ -167,7 +167,7 @@ async def create_fertiliser_usage(
     
     # Verify that the field belongs to the farmer
     check_field_query = text("""
-        SELECT id, field_name FROM fields 
+        SELECT id, field_name FROM "Fields"
         WHERE id = :field_id AND farmer_id = :farmer_id
     """)
     field_result = await db.execute(
@@ -184,7 +184,7 @@ async def create_fertiliser_usage(
     
     # Insert the new fertiliser usage record
     insert_query = text("""
-        INSERT INTO fertiliserusage 
+        INSERT INTO "FertiliserUsage" 
             (farmer_id, field_id, fertiliser_type, amount_kg, weather, notes, date)
         VALUES 
             (:farmer_id, :field_id, :fertiliser_type, :amount_kg, :weather, :notes, :date)
@@ -236,7 +236,7 @@ async def update_fertiliser_usage(
     
     # Check if record exists and belongs to the farmer
     check_query = text("""
-        SELECT id FROM fertiliserusage 
+        SELECT id FROM "FertiliserUsage"
         WHERE id = :usage_id AND farmer_id = :farmer_id
     """)
     check_result = await db.execute(check_query, {"usage_id": usage_id, "farmer_id": farmer_id})
@@ -250,7 +250,7 @@ async def update_fertiliser_usage(
     # If field_id is being updated, verify it belongs to the farmer
     if usage_update.field_id is not None:
         check_field_query = text("""
-            SELECT id FROM fields 
+            SELECT id FROM "Fields"
             WHERE id = :field_id AND farmer_id = :farmer_id
         """)
         field_result = await db.execute(
@@ -299,7 +299,7 @@ async def update_fertiliser_usage(
     
     # Execute update and return updated record with field name
     update_query = text(f"""
-        UPDATE fertiliserusage 
+        UPDATE "FertiliserUsage"
         SET {', '.join(update_fields)}
         WHERE id = :usage_id AND farmer_id = :farmer_id
         RETURNING id, farmer_id, field_id, fertiliser_type, amount_kg, weather, notes, date, created_at
@@ -311,7 +311,7 @@ async def update_fertiliser_usage(
     row = result.fetchone()
     
     # Get field name
-    field_query = text("SELECT field_name FROM fields WHERE id = :field_id")
+    field_query = text("SELECT field_name FROM \"Fields\" WHERE id = :field_id")
     field_result = await db.execute(field_query, {"field_id": row[2]})
     field_row = field_result.fetchone()
     
@@ -342,7 +342,7 @@ async def delete_fertiliser_usage(
     
     # Check if record exists and belongs to the farmer
     check_query = text("""
-        SELECT id FROM fertiliserusage 
+        SELECT id FROM "FertiliserUsage"
         WHERE id = :usage_id AND farmer_id = :farmer_id
     """)
     check_result = await db.execute(check_query, {"usage_id": usage_id, "farmer_id": farmer_id})
@@ -355,7 +355,7 @@ async def delete_fertiliser_usage(
     
     # Delete the record
     delete_query = text("""
-        DELETE FROM fertiliserusage 
+        DELETE FROM "FertiliserUsage"
         WHERE id = :usage_id AND farmer_id = :farmer_id
     """)
     

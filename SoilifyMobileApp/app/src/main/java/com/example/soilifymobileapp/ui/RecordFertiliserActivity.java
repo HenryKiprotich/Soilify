@@ -1,14 +1,11 @@
 package com.example.soilifymobileapp.ui;
 
 import android.app.DatePickerDialog;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -41,19 +38,17 @@ import retrofit2.Response;
 
 public class RecordFertiliserActivity extends AppCompatActivity {
 
-    private RecyclerView recyclerViewFertiliser;
-    private FloatingActionButton fabAddFertiliser;
     private FertiliserUsageAdapter adapter;
-    private List<FertiliserUsageRead> usageList = new ArrayList<>();
-    private List<FieldOption> fieldOptions = new ArrayList<>();
+    private final List<FertiliserUsageRead> usageList = new ArrayList<>();
+    private final List<FieldOption> fieldOptions = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_record_fertiliser);
 
-        recyclerViewFertiliser = findViewById(R.id.recyclerViewFertiliser);
-        fabAddFertiliser = findViewById(R.id.fabAddFertiliser);
+        RecyclerView recyclerViewFertiliser = findViewById(R.id.recyclerViewFertiliser);
+        FloatingActionButton fabAddFertiliser = findViewById(R.id.fabAddFertiliser);
 
         recyclerViewFertiliser.setLayoutManager(new LinearLayoutManager(this));
         adapter = new FertiliserUsageAdapter(usageList, new FertiliserUsageAdapter.OnItemClickListener() {
@@ -76,7 +71,7 @@ public class RecordFertiliserActivity extends AppCompatActivity {
     }
 
     private void loadFertiliserUsage() {
-        FertiliserApi fertiliserApi = ApiClient.getClient(getToken()).create(FertiliserApi.class);
+        FertiliserApi fertiliserApi = ApiClient.getClient(this).create(FertiliserApi.class);
         Call<List<FertiliserUsageRead>> call = fertiliserApi.getAllFertiliserUsage();
         call.enqueue(new Callback<List<FertiliserUsageRead>>() {
             @Override
@@ -98,7 +93,7 @@ public class RecordFertiliserActivity extends AppCompatActivity {
     }
 
     private void loadFieldOptions() {
-        FertiliserApi fertiliserApi = ApiClient.getClient(getToken()).create(FertiliserApi.class);
+        FertiliserApi fertiliserApi = ApiClient.getClient(this).create(FertiliserApi.class);
         Call<List<FieldOption>> call = fertiliserApi.getFieldsForDropdown();
         call.enqueue(new Callback<List<FieldOption>>() {
             @Override
@@ -187,7 +182,7 @@ public class RecordFertiliserActivity extends AppCompatActivity {
     }
 
     private void createFertiliserUsage(FertiliserUsageCreate newUsage) {
-        FertiliserApi fertiliserApi = ApiClient.getClient(getToken()).create(FertiliserApi.class);
+        FertiliserApi fertiliserApi = ApiClient.getClient(this).create(FertiliserApi.class);
         Call<FertiliserUsageRead> call = fertiliserApi.createFertiliserUsage(newUsage);
         call.enqueue(new Callback<FertiliserUsageRead>() {
             @Override
@@ -208,7 +203,7 @@ public class RecordFertiliserActivity extends AppCompatActivity {
     }
 
     private void updateFertiliserUsage(int usageId, FertiliserUsageUpdate updatedUsage) {
-        FertiliserApi fertiliserApi = ApiClient.getClient(getToken()).create(FertiliserApi.class);
+        FertiliserApi fertiliserApi = ApiClient.getClient(this).create(FertiliserApi.class);
         Call<FertiliserUsageRead> call = fertiliserApi.updateFertiliserUsage(usageId, updatedUsage);
         call.enqueue(new Callback<FertiliserUsageRead>() {
             @Override
@@ -229,7 +224,7 @@ public class RecordFertiliserActivity extends AppCompatActivity {
     }
 
     private void deleteFertiliserUsage(int usageId) {
-        FertiliserApi fertiliserApi = ApiClient.getClient(getToken()).create(FertiliserApi.class);
+        FertiliserApi fertiliserApi = ApiClient.getClient(this).create(FertiliserApi.class);
         Call<Void> call = fertiliserApi.deleteFertiliserUsage(usageId);
         call.enqueue(new Callback<Void>() {
             @Override
@@ -247,10 +242,5 @@ public class RecordFertiliserActivity extends AppCompatActivity {
                 Toast.makeText(RecordFertiliserActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private String getToken() {
-        SharedPreferences sharedPreferences = getSharedPreferences("auth", Context.MODE_PRIVATE);
-        return sharedPreferences.getString("token", null);
     }
 }

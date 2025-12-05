@@ -71,7 +71,7 @@ public class AnalyticsActivity extends AppCompatActivity {
     }
 
     private void loadAnalyticsData() {
-        AnalyticsApi apiService = ApiClient.getClient().create(AnalyticsApi.class);
+        AnalyticsApi apiService = ApiClient.getClient(this).create(AnalyticsApi.class);
 
         // Fetch farm overview
         Call<FarmOverview> farmOverviewCall = apiService.getFarmOverview();

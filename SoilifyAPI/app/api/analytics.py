@@ -49,7 +49,7 @@ async def get_farm_overview(
         SELECT 
             COUNT(*) as total_fields,
             COALESCE(SUM(size_hectares), 0) as total_area
-        FROM fields
+        FROM "Fields"
         WHERE farmer_id = :farmer_id
     """)
     fields_result = await db.execute(fields_query, {"farmer_id": farmer_id})
@@ -62,7 +62,7 @@ async def get_farm_overview(
             COALESCE(SUM(amount_kg), 0) as total_amount,
             COALESCE(AVG(amount_kg), 0) as avg_amount,
             COUNT(DISTINCT field_id) as fields_fertilized
-        FROM fertiliserusage
+        FROM "FertiliserUsage"
         WHERE farmer_id = :farmer_id
     """)
     fert_result = await db.execute(fertilizer_query, {"farmer_id": farmer_id})
@@ -71,7 +71,7 @@ async def get_farm_overview(
     # Get most used fertilizer
     most_used_query = text("""
         SELECT fertiliser_type, COUNT(*) as count
-        FROM fertiliserusage
+        FROM "FertiliserUsage"
         WHERE farmer_id = :farmer_id AND fertiliser_type IS NOT NULL
         GROUP BY fertiliser_type
         ORDER BY count DESC
@@ -91,8 +91,8 @@ async def get_farm_overview(
             MAX(w.rainfall) as max_rain,
             MIN(w.temperature) as min_temp,
             COUNT(DISTINCT w.field_id) as fields_monitored
-        FROM weatherdata w
-        INNER JOIN fields f ON w.field_id = f.id
+        FROM "WeatherData" w
+        INNER JOIN "Fields" f ON w.field_id = f.id
         WHERE f.farmer_id = :farmer_id
     """)
     weather_result = await db.execute(weather_query, {"farmer_id": farmer_id})
@@ -104,7 +104,7 @@ async def get_farm_overview(
             COUNT(*) as total_alerts,
             COUNT(CASE WHEN created_at >= CURRENT_DATE - INTERVAL '7 days' THEN 1 END) as alerts_week,
             COUNT(CASE WHEN DATE(created_at) = CURRENT_DATE THEN 1 END) as alerts_today
-        FROM alerts
+        FROM "Alerts"
         WHERE farmer_id = :farmer_id
     """)
     alerts_result = await db.execute(alerts_query, {"farmer_id": farmer_id})
@@ -113,11 +113,11 @@ async def get_farm_overview(
     # Get recent activity dates
     activity_query = text("""
         SELECT 
-            (SELECT MAX(date) FROM fertiliserusage WHERE farmer_id = :farmer_id) as last_fert,
-            (SELECT MAX(created_at) FROM weatherdata w 
-             INNER JOIN fields f ON w.field_id = f.id 
+            (SELECT MAX(date) FROM "FertiliserUsage" WHERE farmer_id = :farmer_id) as last_fert,
+            (SELECT MAX(created_at) FROM "WeatherData" w 
+             INNER JOIN "Fields" f ON w.field_id = f.id 
              WHERE f.farmer_id = :farmer_id) as last_weather,
-            (SELECT MAX(created_at) FROM alerts WHERE farmer_id = :farmer_id) as last_alert
+            (SELECT MAX(created_at) FROM "Alerts" WHERE farmer_id = :farmer_id) as last_alert
     """)
     activity_result = await db.execute(activity_query, {"farmer_id": farmer_id})
     activity_row = activity_result.fetchone()
@@ -162,7 +162,7 @@ async def get_fertilizer_by_type(
     query = text("""
         WITH totals AS (
             SELECT SUM(amount_kg) as grand_total
-            FROM fertiliserusage
+            FROM "FertiliserUsage"
             WHERE farmer_id = :farmer_id
         )
         SELECT 
@@ -170,7 +170,7 @@ async def get_fertilizer_by_type(
             SUM(fu.amount_kg) as total_amount,
             COUNT(*) as application_count,
             (SUM(fu.amount_kg) / NULLIF(t.grand_total, 0) * 100) as percentage
-        FROM fertiliserusage fu
+        FROM "FertiliserUsage" fu
         CROSS JOIN totals t
         WHERE fu.farmer_id = :farmer_id AND fu.fertiliser_type IS NOT NULL
         GROUP BY fu.fertiliser_type, t.grand_total
@@ -207,14 +207,14 @@ async def get_fertilizer_by_field(
             COUNT(fu.id) as application_count,
             (
                 SELECT fertiliser_type
-                FROM fertiliserusage
+                FROM "FertiliserUsage"
                 WHERE field_id = f.id AND fertiliser_type IS NOT NULL
                 GROUP BY fertiliser_type
                 ORDER BY COUNT(*) DESC
                 LIMIT 1
             ) as most_used_type
-        FROM fields f
-        LEFT JOIN fertiliserusage fu ON f.id = fu.field_id
+        FROM "Fields" f
+        LEFT JOIN "FertiliserUsage" fu ON f.id = fu.field_id
         WHERE f.farmer_id = :farmer_id
         GROUP BY f.id, f.field_name
         ORDER BY total_amount DESC
@@ -250,7 +250,7 @@ async def get_fertilizer_by_month(
             EXTRACT(YEAR FROM date) as year,
             SUM(amount_kg) as total_amount,
             COUNT(*) as application_count
-        FROM fertiliserusage
+        FROM "FertiliserUsage"
         WHERE farmer_id = :farmer_id 
         AND date >= CURRENT_DATE - INTERVAL ':months months'
         GROUP BY TO_CHAR(date, 'Month'), EXTRACT(YEAR FROM date), EXTRACT(MONTH FROM date)
@@ -287,8 +287,8 @@ async def get_weather_by_field(
             AVG(w.rainfall) as avg_rain,
             AVG(w.soil_moisture) as avg_moisture,
             COUNT(w.id) as record_count
-        FROM fields f
-        LEFT JOIN weatherdata w ON f.id = w.field_id
+        FROM "Fields" f
+        LEFT JOIN "WeatherData" w ON f.id = w.field_id
         WHERE f.farmer_id = :farmer_id
         GROUP BY f.id, f.field_name
         ORDER BY record_count DESC
@@ -323,7 +323,7 @@ async def get_weather_trends(
     if field_id:
         # Verify field belongs to farmer
         check_query = text("""
-            SELECT id FROM fields WHERE id = :field_id AND farmer_id = :farmer_id
+            SELECT id FROM "Fields" WHERE id = :field_id AND farmer_id = :farmer_id
         """)
         check_result = await db.execute(check_query, {"field_id": field_id, "farmer_id": farmer_id})
         if not check_result.fetchone():
@@ -338,7 +338,7 @@ async def get_weather_trends(
                 AVG(w.temperature) as avg_temp,
                 AVG(w.rainfall) as avg_rain,
                 AVG(w.soil_moisture) as avg_moisture
-            FROM weatherdata w
+            FROM "WeatherData" w
             WHERE w.field_id = :field_id
             AND w.created_at >= CURRENT_DATE - INTERVAL ':days days'
             GROUP BY DATE(w.created_at)
@@ -352,8 +352,8 @@ async def get_weather_trends(
                 AVG(w.temperature) as avg_temp,
                 AVG(w.rainfall) as avg_rain,
                 AVG(w.soil_moisture) as avg_moisture
-            FROM weatherdata w
-            INNER JOIN fields f ON w.field_id = f.id
+            FROM "WeatherData" w
+            INNER JOIN "Fields" f ON w.field_id = f.id
             WHERE f.farmer_id = :farmer_id
             AND w.created_at >= CURRENT_DATE - INTERVAL ':days days'
             GROUP BY DATE(w.created_at)
@@ -399,10 +399,10 @@ async def get_field_analytics(
             AVG(w.soil_moisture) as avg_moisture,
             COUNT(a.id) as total_alerts,
             COUNT(CASE WHEN a.created_at >= CURRENT_DATE - INTERVAL '7 days' THEN 1 END) as recent_alerts
-        FROM fields f
-        LEFT JOIN fertiliserusage fu ON f.id = fu.field_id
-        LEFT JOIN weatherdata w ON f.id = w.field_id
-        LEFT JOIN alerts a ON f.id = a.field_id
+        FROM "Fields" f
+        LEFT JOIN "FertiliserUsage" fu ON f.id = fu.field_id
+        LEFT JOIN "WeatherData" w ON f.id = w.field_id
+        LEFT JOIN "Alerts" a ON f.id = a.field_id
         WHERE f.id = :field_id AND f.farmer_id = :farmer_id
         GROUP BY f.id, f.field_name, f.soil_type, f.crop_type, f.size_hectares
     """)
@@ -459,12 +459,12 @@ async def get_date_range_stats(
             AVG(w.rainfall) as avg_rain,
             COUNT(a.id) as alerts_count
         FROM (SELECT 1) dummy
-        LEFT JOIN fertiliserusage fu ON fu.farmer_id = :farmer_id 
+        LEFT JOIN "FertiliserUsage" fu ON fu.farmer_id = :farmer_id 
             AND fu.date BETWEEN :start_date AND :end_date
-        LEFT JOIN weatherdata w ON w.field_id IN (
-            SELECT id FROM fields WHERE farmer_id = :farmer_id
+        LEFT JOIN "WeatherData" w ON w.field_id IN (
+            SELECT id FROM "Fields" WHERE farmer_id = :farmer_id
         ) AND DATE(w.created_at) BETWEEN :start_date AND :end_date
-        LEFT JOIN alerts a ON a.farmer_id = :farmer_id 
+        LEFT JOIN "Alerts" a ON a.farmer_id = :farmer_id 
             AND DATE(a.created_at) BETWEEN :start_date AND :end_date
     """)
     
@@ -505,14 +505,14 @@ async def get_top_fields(
             COUNT(fu.id) as application_count,
             (
                 SELECT fertiliser_type
-                FROM fertiliserusage
+                FROM "FertiliserUsage"
                 WHERE field_id = f.id AND fertiliser_type IS NOT NULL
                 GROUP BY fertiliser_type
                 ORDER BY COUNT(*) DESC
                 LIMIT 1
             ) as most_used_type
-        FROM fields f
-        INNER JOIN fertiliserusage fu ON f.id = fu.field_id
+        FROM "Fields" f
+        INNER JOIN "FertiliserUsage" fu ON f.id = fu.field_id
         WHERE f.farmer_id = :farmer_id
         GROUP BY f.id, f.field_name
         ORDER BY total_amount DESC
@@ -524,7 +524,7 @@ async def get_top_fields(
     # Largest fields
     largest_query = text("""
         SELECT id, field_name, size_hectares, crop_type
-        FROM fields
+        FROM "Fields"
         WHERE farmer_id = :farmer_id
         ORDER BY size_hectares DESC NULLS LAST
         LIMIT :limit
@@ -538,8 +538,8 @@ async def get_top_fields(
             f.id,
             f.field_name,
             COUNT(a.id) as alert_count
-        FROM fields f
-        INNER JOIN alerts a ON f.id = a.field_id
+        FROM "Fields" f
+        INNER JOIN "Alerts" a ON f.id = a.field_id
         WHERE f.farmer_id = :farmer_id
         GROUP BY f.id, f.field_name
         ORDER BY alert_count DESC
@@ -592,8 +592,8 @@ async def get_efficiency_metrics(
             COALESCE(SUM(f.size_hectares), 0) as total_area,
             COALESCE(SUM(fu.amount_kg), 0) as total_fertilizer,
             COUNT(DISTINCT f.id) as fields_count
-        FROM fields f
-        LEFT JOIN fertiliserusage fu ON f.id = fu.field_id
+        FROM "Fields" f
+        LEFT JOIN "FertiliserUsage" fu ON f.id = fu.field_id
         WHERE f.farmer_id = :farmer_id
     """)
     
@@ -646,9 +646,9 @@ async def get_analytics_by_crop_type(
             END as fertilizer_per_hectare,
             AVG(w.temperature) as avg_temp,
             AVG(w.rainfall) as avg_rain
-        FROM fields f
-        LEFT JOIN fertiliserusage fu ON f.id = fu.field_id
-        LEFT JOIN weatherdata w ON f.id = w.field_id
+        FROM "Fields" f
+        LEFT JOIN "FertiliserUsage" fu ON f.id = fu.field_id
+        LEFT JOIN "WeatherData" w ON f.id = w.field_id
         WHERE f.farmer_id = :farmer_id AND f.crop_type IS NOT NULL
         GROUP BY f.crop_type
         ORDER BY fields_count DESC
@@ -692,14 +692,14 @@ async def get_analytics_by_soil_type(
             END as fertilizer_per_hectare,
             (
                 SELECT crop_type
-                FROM fields
+                FROM "Fields"
                 WHERE farmer_id = :farmer_id AND soil_type = f.soil_type AND crop_type IS NOT NULL
                 GROUP BY crop_type
                 ORDER BY COUNT(*) DESC
                 LIMIT 1
             ) as most_common_crop
-        FROM fields f
-        LEFT JOIN fertiliserusage fu ON f.id = fu.field_id
+        FROM "Fields" f
+        LEFT JOIN "FertiliserUsage" fu ON f.id = fu.field_id
         WHERE f.farmer_id = :farmer_id AND f.soil_type IS NOT NULL
         GROUP BY f.soil_type
         ORDER BY fields_count DESC

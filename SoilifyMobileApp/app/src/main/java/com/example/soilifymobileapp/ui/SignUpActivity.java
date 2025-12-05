@@ -58,7 +58,7 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void signUpUser(String firstName, String otherName, String phone, String email, String password, String location) {
-        AuthApi authApi = ApiClient.getClient().create(AuthApi.class);
+        AuthApi authApi = ApiClient.getClientNoAuth().create(AuthApi.class);
         UserCreate userCreate = new UserCreate(firstName, otherName, phone, email, password, location);
 
         Call<Token> call = authApi.signup(userCreate);

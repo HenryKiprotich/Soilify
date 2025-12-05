@@ -33,7 +33,7 @@ async def get_fields_for_dropdown(
             soil_type, 
             crop_type, 
             size_hectares
-        FROM fields
+        FROM "Fields"
         WHERE farmer_id = :farmer_id
         ORDER BY field_name ASC
     """)
@@ -77,8 +77,8 @@ async def get_all_weather_data(
                 wd.rainfall,
                 wd.soil_moisture,
                 wd.created_at
-            FROM weatherdata wd
-            INNER JOIN fields f ON wd.field_id = f.id
+            FROM "WeatherData" wd
+            INNER JOIN "Fields" f ON wd.field_id = f.id
             WHERE f.farmer_id = :farmer_id AND wd.field_id = :field_id
             ORDER BY wd.created_at DESC
         """)
@@ -93,8 +93,8 @@ async def get_all_weather_data(
                 wd.rainfall,
                 wd.soil_moisture,
                 wd.created_at
-            FROM weatherdata wd
-            INNER JOIN fields f ON wd.field_id = f.id
+            FROM "WeatherData" wd
+            INNER JOIN "Fields" f ON wd.field_id = f.id
             WHERE f.farmer_id = :farmer_id
             ORDER BY wd.created_at DESC
         """)
@@ -136,8 +136,8 @@ async def get_weather_statistics(
             AVG(wd.soil_moisture) AS avg_soil_moisture,
             COUNT(wd.id) AS total_readings,
             MAX(wd.created_at) AS latest_reading_date
-        FROM fields f
-        LEFT JOIN weatherdata wd ON f.id = wd.field_id
+        FROM "Fields" f
+        LEFT JOIN "WeatherData" wd ON f.id = wd.field_id
         WHERE f.farmer_id = :farmer_id
         GROUP BY f.id, f.field_name
         ORDER BY f.field_name ASC
@@ -181,8 +181,8 @@ async def get_weather_data(
             wd.rainfall,
             wd.soil_moisture,
             wd.created_at
-        FROM weatherdata wd
-        INNER JOIN fields f ON wd.field_id = f.id
+        FROM "WeatherData" wd
+        INNER JOIN "Fields" f ON wd.field_id = f.id
         WHERE wd.id = :weather_id AND f.farmer_id = :farmer_id
     """)
     
@@ -219,7 +219,7 @@ async def create_weather_data(
     
     # Verify that the field belongs to the farmer
     check_field_query = text("""
-        SELECT id, field_name FROM fields 
+        SELECT id, field_name FROM "Fields" 
         WHERE id = :field_id AND farmer_id = :farmer_id
     """)
     field_result = await db.execute(
@@ -236,7 +236,7 @@ async def create_weather_data(
     
     # Insert the new weather data record
     insert_query = text("""
-        INSERT INTO weatherdata 
+        INSERT INTO "WeatherData" 
             (field_id, temperature, rainfall, soil_moisture)
         VALUES 
             (:field_id, :temperature, :rainfall, :soil_moisture)
@@ -283,8 +283,8 @@ async def update_weather_data(
     # Check if record exists and the field belongs to the farmer
     check_query = text("""
         SELECT wd.id 
-        FROM weatherdata wd
-        INNER JOIN fields f ON wd.field_id = f.id
+        FROM "WeatherData" wd
+        INNER JOIN "Fields" f ON wd.field_id = f.id
         WHERE wd.id = :weather_id AND f.farmer_id = :farmer_id
     """)
     check_result = await db.execute(check_query, {"weather_id": weather_id, "farmer_id": farmer_id})
@@ -298,7 +298,7 @@ async def update_weather_data(
     # If field_id is being updated, verify it belongs to the farmer
     if weather_update.field_id is not None:
         check_field_query = text("""
-            SELECT id FROM fields 
+            SELECT id FROM "Fields" 
             WHERE id = :field_id AND farmer_id = :farmer_id
         """)
         field_result = await db.execute(
@@ -339,7 +339,7 @@ async def update_weather_data(
     
     # Execute update and return updated record with field name
     update_query = text(f"""
-        UPDATE weatherdata 
+        UPDATE "WeatherData" 
         SET {', '.join(update_fields)}
         WHERE id = :weather_id
         RETURNING id, field_id, temperature, rainfall, soil_moisture, created_at
@@ -351,7 +351,7 @@ async def update_weather_data(
     row = result.fetchone()
     
     # Get field name
-    field_query = text("SELECT field_name FROM fields WHERE id = :field_id")
+    field_query = text("SELECT field_name FROM \"Fields\" WHERE id = :field_id")
     field_result = await db.execute(field_query, {"field_id": row[1]})
     field_row = field_result.fetchone()
     
@@ -380,8 +380,8 @@ async def delete_weather_data(
     # Check if record exists and the field belongs to the farmer
     check_query = text("""
         SELECT wd.id 
-        FROM weatherdata wd
-        INNER JOIN fields f ON wd.field_id = f.id
+        FROM "WeatherData" wd
+        INNER JOIN "Fields" f ON wd.field_id = f.id
         WHERE wd.id = :weather_id AND f.farmer_id = :farmer_id
     """)
     check_result = await db.execute(check_query, {"weather_id": weather_id, "farmer_id": farmer_id})
@@ -394,7 +394,7 @@ async def delete_weather_data(
     
     # Delete the record
     delete_query = text("""
-        DELETE FROM weatherdata 
+        DELETE FROM "WeatherData" 
         WHERE id = :weather_id
     """)
     

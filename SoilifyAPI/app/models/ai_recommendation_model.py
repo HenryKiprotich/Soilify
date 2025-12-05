@@ -4,7 +4,7 @@ from sqlalchemy.sql import func
 from app.database.database import Base
 
 class AIConversation(Base):
-    __tablename__ = "ai_conversations"
+    __tablename__ = "AIConversations"
     
     id = Column("id", Integer, primary_key=True, index=True)
     farmer_id = Column("farmer_id", Integer, ForeignKey("users.id"), nullable=True)

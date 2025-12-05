@@ -3,6 +3,9 @@ package com.example.soilifymobileapp.models;
 import com.google.gson.annotations.SerializedName;
 
 public class Token {
+    @SerializedName("message")
+    private String message;
+    
     @SerializedName("access_token")
     private String accessToken;
 
@@ -10,6 +13,14 @@ public class Token {
     private String tokenType;
 
     // Getters and Setters
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
     public String getAccessToken() {
         return accessToken;
     }

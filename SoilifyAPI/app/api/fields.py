@@ -29,7 +29,7 @@ async def get_all_fields(
             crop_type, 
             size_hectares, 
             created_at
-        FROM fields
+        FROM "Fields"
         WHERE farmer_id = :farmer_id
         ORDER BY created_at DESC
     """)
@@ -72,7 +72,7 @@ async def get_field(
             crop_type, 
             size_hectares, 
             created_at
-        FROM fields
+        FROM "Fields"
         WHERE id = :field_id AND farmer_id = :farmer_id
     """)
     
@@ -108,7 +108,7 @@ async def create_field(
     farmer_id = current_user["user_id"]
     
     # Verify that the farmer exists
-    check_user_query = text("SELECT id FROM users WHERE id = :farmer_id")
+    check_user_query = text("SELECT id FROM \"Users\" WHERE id = :farmer_id")
     user_result = await db.execute(check_user_query, {"farmer_id": farmer_id})
     if not user_result.fetchone():
         raise HTTPException(
@@ -118,7 +118,7 @@ async def create_field(
     
     # Insert the new field
     insert_query = text("""
-        INSERT INTO fields (farmer_id, field_name, soil_type, crop_type, size_hectares)
+        INSERT INTO "Fields" (farmer_id, field_name, soil_type, crop_type, size_hectares)
         VALUES (:farmer_id, :field_name, :soil_type, :crop_type, :size_hectares)
         RETURNING id, farmer_id, field_name, soil_type, crop_type, size_hectares, created_at
     """)
@@ -162,7 +162,7 @@ async def update_field(
     
     # Check if field exists and belongs to the farmer
     check_query = text("""
-        SELECT id FROM fields 
+        SELECT id FROM "Fields" 
         WHERE id = :field_id AND farmer_id = :farmer_id
     """)
     check_result = await db.execute(check_query, {"field_id": field_id, "farmer_id": farmer_id})
@@ -201,7 +201,7 @@ async def update_field(
     
     # Execute update
     update_query = text(f"""
-        UPDATE fields 
+        UPDATE "Fields" 
         SET {', '.join(update_fields)}
         WHERE id = :field_id AND farmer_id = :farmer_id
         RETURNING id, farmer_id, field_name, soil_type, crop_type, size_hectares, created_at
@@ -236,7 +236,7 @@ async def delete_field(
     
     # Check if field exists and belongs to the farmer
     check_query = text("""
-        SELECT id FROM fields 
+        SELECT id FROM "Fields" 
         WHERE id = :field_id AND farmer_id = :farmer_id
     """)
     check_result = await db.execute(check_query, {"field_id": field_id, "farmer_id": farmer_id})
@@ -249,7 +249,7 @@ async def delete_field(
     
     # Delete the field
     delete_query = text("""
-        DELETE FROM fields 
+        DELETE FROM "Fields" 
         WHERE id = :field_id AND farmer_id = :farmer_id
     """)
     

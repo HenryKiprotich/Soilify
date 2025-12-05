@@ -1,7 +1,5 @@
 package com.example.soilifymobileapp.ui;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.LayoutInflater;
@@ -32,18 +30,16 @@ import retrofit2.Response;
 
 public class FieldsActivity extends AppCompatActivity {
 
-    private RecyclerView recyclerViewFields;
-    private FloatingActionButton fabAddField;
     private FieldsAdapter adapter;
-    private List<FieldRead> fieldList = new ArrayList<>();
+    private final List<FieldRead> fieldList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fields);
 
-        recyclerViewFields = findViewById(R.id.recyclerViewFields);
-        fabAddField = findViewById(R.id.fabAddField);
+        RecyclerView recyclerViewFields = findViewById(R.id.recyclerViewFields);
+        FloatingActionButton fabAddField = findViewById(R.id.fabAddField);
 
         recyclerViewFields.setLayoutManager(new LinearLayoutManager(this));
         adapter = new FieldsAdapter(fieldList, new FieldsAdapter.OnItemClickListener() {
@@ -65,7 +61,7 @@ public class FieldsActivity extends AppCompatActivity {
     }
 
     private void loadFields() {
-        FieldsApi fieldsApi = ApiClient.getClient(getToken()).create(FieldsApi.class);
+        FieldsApi fieldsApi = ApiClient.getClient(this).create(FieldsApi.class);
         Call<List<FieldRead>> call = fieldsApi.getAllFields();
         call.enqueue(new Callback<List<FieldRead>>() {
             @Override
@@ -126,7 +122,7 @@ public class FieldsActivity extends AppCompatActivity {
     }
 
     private void createField(FieldCreate newField) {
-        FieldsApi fieldsApi = ApiClient.getClient(getToken()).create(FieldsApi.class);
+        FieldsApi fieldsApi = ApiClient.getClient(this).create(FieldsApi.class);
         Call<FieldRead> call = fieldsApi.createField(newField);
         call.enqueue(new Callback<FieldRead>() {
             @Override
@@ -147,7 +143,7 @@ public class FieldsActivity extends AppCompatActivity {
     }
 
     private void updateField(int fieldId, FieldUpdate updatedField) {
-        FieldsApi fieldsApi = ApiClient.getClient(getToken()).create(FieldsApi.class);
+        FieldsApi fieldsApi = ApiClient.getClient(this).create(FieldsApi.class);
         Call<FieldRead> call = fieldsApi.updateField(fieldId, updatedField);
         call.enqueue(new Callback<FieldRead>() {
             @Override
@@ -168,7 +164,7 @@ public class FieldsActivity extends AppCompatActivity {
     }
 
     private void deleteField(int fieldId) {
-        FieldsApi fieldsApi = ApiClient.getClient(getToken()).create(FieldsApi.class);
+        FieldsApi fieldsApi = ApiClient.getClient(this).create(FieldsApi.class);
         Call<Void> call = fieldsApi.deleteField(fieldId);
         call.enqueue(new Callback<Void>() {
             @Override
@@ -186,10 +182,5 @@ public class FieldsActivity extends AppCompatActivity {
                 Toast.makeText(FieldsActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private String getToken() {
-        SharedPreferences sharedPreferences = getSharedPreferences("auth", Context.MODE_PRIVATE);
-        return sharedPreferences.getString("token", null);
     }
 }

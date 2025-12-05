@@ -14,6 +14,8 @@ import google.generativeai as genai
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config.settings import settings
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -23,7 +25,7 @@ class LLMManager:
 
     def __init__(self):
         """Initialize Google Gemini API"""
-        api_key = os.getenv("GOOGLE_API_KEY")
+        api_key = settings.GOOGLE_API_KEY
         if not api_key:
             raise ValueError("GOOGLE_API_KEY environment variable not set")
 
@@ -85,7 +87,7 @@ class LLMManager:
             # Get conversation history for context
             history_query = text("""
                 SELECT message, response 
-                FROM ai_conversations 
+                FROM "AConversations"
                 WHERE farmer_id = :farmer_id AND session_id = :session_id
                 ORDER BY created_at DESC 
                 LIMIT 5
@@ -129,7 +131,7 @@ Provide a helpful, clear response:
 
             # Store conversation
             insert_query = text("""
-                INSERT INTO ai_conversations 
+                INSERT INTO "AIConversations" 
                     (farmer_id, session_id, message, response, model, metadata)
                 VALUES 
                     (:farmer_id, :session_id, :message, :response, :model, :metadata)
@@ -252,7 +254,7 @@ Provide a clear, natural language answer to the farmer's question based on these
 
             # Store conversation
             insert_query = text("""
-                INSERT INTO ai_conversations 
+                INSERT INTO "AIConversations" 
                     (farmer_id, session_id, message, response, model, metadata)
                 VALUES 
                     (:farmer_id, :session_id, :message, :response, :model, :metadata)
@@ -310,10 +312,10 @@ Provide a clear, natural language answer to the farmer's question based on these
                     AVG(wd.rainfall) as avg_rainfall,
                     AVG(wd.soil_moisture) as avg_soil_moisture,
                     COUNT(DISTINCT a.id) as alerts_count
-                FROM fields f
-                LEFT JOIN fertiliserusage fu ON f.id = fu.field_id
-                LEFT JOIN weatherdata wd ON f.id = wd.field_id
-                LEFT JOIN alerts a ON f.id = a.field_id
+                FROM "Fields" f
+                LEFT JOIN "FertiliserUsage" fu ON f.id = fu.field_id
+                LEFT JOIN "WeatherData" wd ON f.id = wd.field_id
+                LEFT JOIN "Alerts" a ON f.id = a.field_id
                 WHERE f.id = :field_id AND f.farmer_id = :farmer_id
                 GROUP BY f.id, f.field_name, f.soil_type, f.crop_type, f.size_hectares
             """)
@@ -367,7 +369,7 @@ Analysis:
 
             # Store conversation
             insert_query = text("""
-                INSERT INTO ai_conversations 
+                INSERT INTO "AIConversations" 
                     (farmer_id, session_id, message, response, model, metadata)
                 VALUES 
                     (:farmer_id, :session_id, :message, :response, :model, :metadata)

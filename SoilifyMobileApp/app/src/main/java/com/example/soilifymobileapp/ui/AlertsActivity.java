@@ -1,7 +1,5 @@
 package com.example.soilifymobileapp.ui;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -25,16 +23,15 @@ import retrofit2.Response;
 
 public class AlertsActivity extends AppCompatActivity {
 
-    private RecyclerView rvAlerts;
     private AlertsAdapter adapter;
-    private List<Alert> alertList = new ArrayList<>();
+    private final List<Alert> alertList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alerts);
 
-        rvAlerts = findViewById(R.id.rvAlerts);
+        RecyclerView rvAlerts = findViewById(R.id.rvAlerts);
         rvAlerts.setLayoutManager(new LinearLayoutManager(this));
 
         adapter = new AlertsAdapter(this, alertList);
@@ -44,7 +41,7 @@ public class AlertsActivity extends AppCompatActivity {
     }
 
     private void loadAlerts() {
-        AlertsApi alertsApi = ApiClient.getClient(getToken()).create(AlertsApi.class);
+        AlertsApi alertsApi = ApiClient.getClient(this).create(AlertsApi.class);
         Call<List<AlertRead>> call = alertsApi.getAllAlerts(null, 50);
         call.enqueue(new Callback<List<AlertRead>>() {
             @Override
@@ -65,10 +62,5 @@ public class AlertsActivity extends AppCompatActivity {
                 Toast.makeText(AlertsActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private String getToken() {
-        SharedPreferences sharedPreferences = getSharedPreferences("auth", Context.MODE_PRIVATE);
-        return sharedPreferences.getString("token", null);
     }
 }

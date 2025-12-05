@@ -20,7 +20,7 @@ router = APIRouter(prefix="")
 async def signup(user: UserCreate, db: AsyncSession = Depends(get_db)):
     # Check if user already exists
     check_query = text("""
-        SELECT id FROM users 
+        SELECT id FROM "Users" 
         WHERE phone_number = :phone_number OR email_adress = :email_adress
     """)
     result = await db.execute(
@@ -34,7 +34,7 @@ async def signup(user: UserCreate, db: AsyncSession = Depends(get_db)):
     
     # Insert new user
     insert_query = text("""
-        INSERT INTO users (first_name, other_name, phone_number, email_adress, password_hash, location)
+        INSERT INTO "Users" (first_name, other_name, phone_number, email_adress, password_hash, location)
         VALUES (:first_name, :other_name, :phone_number, :email_adress, :password_hash, :location)
         RETURNING id
     """)
@@ -64,10 +64,10 @@ async def signin(user: UserLogin, db: AsyncSession = Depends(get_db)):
     
     # Query user by email or phone number
     if user.email_adress:
-        query = text("SELECT id, password_hash FROM users WHERE email_adress = :email_adress")
+        query = text("SELECT id, password_hash FROM \"Users\" WHERE email_adress = :email_adress")
         result = await db.execute(query, {"email_adress": user.email_adress})
     else:
-        query = text("SELECT id, password_hash FROM users WHERE phone_number = :phone_number")
+        query = text("SELECT id, password_hash FROM \"Users\" WHERE phone_number = :phone_number")
         result = await db.execute(query, {"phone_number": user.phone_number})
     
     db_user = result.fetchone()
@@ -82,15 +82,19 @@ async def signin(user: UserLogin, db: AsyncSession = Depends(get_db)):
     
     # Create JWT token
     access_token = create_access_token({"user_id": user_id})
-    response = JSONResponse(content={"message": "Login successful"})
+    response = JSONResponse(content={
+        "message": "Login successful",
+        "access_token": access_token,
+        "token_type": "bearer"
+    })
     response.set_cookie(
         key="token", 
         value=access_token, 
         httponly=True,
         secure=False,   # Set to True in production with HTTPS
-        samesite="lax",  
-        max_age=3600,
-        domain="localhost"
+        samesite="none",  # Changed from "lax" to "none" for cross-origin requests
+        max_age=3600
+        # Removed domain parameter - cookies will be sent to the server that set them
     )
     return response
 
@@ -112,7 +116,7 @@ async def forgot_password(user_email: UserEmail, db: AsyncSession = Depends(get_
     Endpoint to initiate password reset.
     Checks if the user exists and generates a reset token.
     """
-    query = text("SELECT id FROM users WHERE email_adress = :email_adress")
+    query = text("SELECT id FROM \"Users\" WHERE email_adress = :email_adress")
     result = await db.execute(query, {"email_adress": user_email.email_adress})
     user = result.fetchone()
     
@@ -133,7 +137,7 @@ async def reset_password(reset_data: ResetPasswordRequest, db: AsyncSession = De
     user_id = verify_reset_token(reset_data.token)
     
     # Check if user exists
-    check_query = text("SELECT id FROM users WHERE id = :user_id")
+    check_query = text("SELECT id FROM \"Users\" WHERE id = :user_id")
     result = await db.execute(check_query, {"user_id": user_id})
     user = result.fetchone()
     
@@ -142,7 +146,7 @@ async def reset_password(reset_data: ResetPasswordRequest, db: AsyncSession = De
     
     # Update password
     update_query = text("""
-        UPDATE users 
+        UPDATE "Users" 
         SET password_hash = :password_hash 
         WHERE id = :user_id
     """)

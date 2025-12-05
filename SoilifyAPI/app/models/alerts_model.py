@@ -3,7 +3,7 @@ from sqlalchemy.sql import func
 from app.database.database import Base
 
 class Alert(Base):
-    __tablename__ = "alerts"
+    __tablename__ = "Alerts"
 
     id = Column("id", Integer, primary_key=True, index=True)
     farmer_id = Column("farmer_id", Integer, ForeignKey("users.id"), nullable=False)

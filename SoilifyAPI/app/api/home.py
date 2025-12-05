@@ -86,7 +86,7 @@ async def get_dashboard(
             first_name,
             other_name,
             location
-        FROM users
+        FROM "Users"
         WHERE id = :farmer_id
     """)
     user_result = await db.execute(user_query, {"farmer_id": farmer_id})
@@ -99,14 +99,14 @@ async def get_dashboard(
     # Get quick statistics
     stats_query = text("""
         SELECT 
-            (SELECT COUNT(*) FROM fields WHERE farmer_id = :farmer_id) as total_fields,
-            (SELECT COUNT(*) FROM alerts 
+            (SELECT COUNT(*) FROM "Fields" WHERE farmer_id = :farmer_id) as total_fields,
+            (SELECT COUNT(*) FROM "Alerts" 
              WHERE farmer_id = :farmer_id 
              AND created_at >= CURRENT_DATE - INTERVAL '7 days') as pending_alerts,
-            (SELECT MAX(date) FROM fertiliserusage 
+            (SELECT MAX(date) FROM "FertiliserUsage" 
              WHERE farmer_id = :farmer_id) as last_fert_date,
-            (SELECT COUNT(*) FROM weatherdata w
-             INNER JOIN fields f ON w.field_id = f.id
+            (SELECT COUNT(*) FROM "WeatherData" w
+             INNER JOIN "Fields" f ON w.field_id = f.id
              WHERE f.farmer_id = :farmer_id
              AND DATE(w.created_at) = CURRENT_DATE) as weather_today
     """)
@@ -121,8 +121,8 @@ async def get_dashboard(
             a.field_id,
             f.field_name,
             a.created_at
-        FROM alerts a
-        LEFT JOIN fields f ON a.field_id = f.id
+        FROM "Alerts" a
+        LEFT JOIN "Fields" f ON a.field_id = f.id
         WHERE a.farmer_id = :farmer_id
         ORDER BY a.created_at DESC
         LIMIT 5
@@ -135,11 +135,11 @@ async def get_dashboard(
     
     activity_query = text("""
         SELECT 
-            EXISTS(SELECT 1 FROM fertiliserusage WHERE farmer_id = :farmer_id) OR
-            EXISTS(SELECT 1 FROM weatherdata w 
-                   INNER JOIN fields f ON w.field_id = f.id 
+            EXISTS(SELECT 1 FROM "FertiliserUsage" WHERE farmer_id = :farmer_id) OR
+            EXISTS(SELECT 1 FROM "WeatherData" w
+                   INNER JOIN "Fields" f ON w.field_id = f.id
                    WHERE f.farmer_id = :farmer_id) OR
-            EXISTS(SELECT 1 FROM alerts WHERE farmer_id = :farmer_id)
+            EXISTS(SELECT 1 FROM "Alerts" WHERE farmer_id = :farmer_id)
         AS has_activity
     """)
     activity_result = await db.execute(activity_query, {"farmer_id": farmer_id})
@@ -196,7 +196,7 @@ async def get_dashboard_with_fields(
             first_name,
             other_name,
             location
-        FROM users
+        FROM "Users"
         WHERE id = :farmer_id
     """)
     user_result = await db.execute(user_query, {"farmer_id": farmer_id})
@@ -209,14 +209,14 @@ async def get_dashboard_with_fields(
     # Get quick statistics
     stats_query = text("""
         SELECT 
-            (SELECT COUNT(*) FROM fields WHERE farmer_id = :farmer_id) as total_fields,
-            (SELECT COUNT(*) FROM alerts 
+            (SELECT COUNT(*) FROM "Fields" WHERE farmer_id = :farmer_id) as total_fields,
+            (SELECT COUNT(*) FROM "Alerts" 
              WHERE farmer_id = :farmer_id 
              AND created_at >= CURRENT_DATE - INTERVAL '7 days') as pending_alerts,
-            (SELECT MAX(date) FROM fertiliserusage 
+            (SELECT MAX(date) FROM "FertiliserUsage" 
              WHERE farmer_id = :farmer_id) as last_fert_date,
-            (SELECT COUNT(*) FROM weatherdata w
-             INNER JOIN fields f ON w.field_id = f.id
+            (SELECT COUNT(*) FROM "WeatherData" w
+             INNER JOIN "Fields" f ON w.field_id = f.id
              WHERE f.farmer_id = :farmer_id
              AND DATE(w.created_at) = CURRENT_DATE) as weather_today
     """)
@@ -231,8 +231,8 @@ async def get_dashboard_with_fields(
             a.field_id,
             f.field_name,
             a.created_at
-        FROM alerts a
-        LEFT JOIN fields f ON a.field_id = f.id
+        FROM "Alerts" a
+        LEFT JOIN "Fields" f ON a.field_id = f.id
         WHERE a.farmer_id = :farmer_id
         ORDER BY a.created_at DESC
         LIMIT 5
@@ -253,10 +253,10 @@ async def get_dashboard_with_fields(
                 a.created_at
             )) as last_activity,
             COUNT(DISTINCT a.id) as alert_count
-        FROM fields f
-        LEFT JOIN fertiliserusage fu ON f.id = fu.field_id
-        LEFT JOIN weatherdata w ON f.id = w.field_id
-        LEFT JOIN alerts a ON f.id = a.field_id
+        FROM "Fields" f
+        LEFT JOIN "FertiliserUsage" fu ON f.id = fu.field_id
+        LEFT JOIN "WeatherData" w ON f.id = w.field_id
+        LEFT JOIN "Alerts" a ON f.id = a.field_id
         WHERE f.farmer_id = :farmer_id
         GROUP BY f.id, f.field_name, f.crop_type, f.size_hectares
         ORDER BY f.field_name ASC
@@ -317,17 +317,17 @@ async def get_quick_stats(
     
     query = text("""
         SELECT 
-            (SELECT COUNT(*) FROM fields WHERE farmer_id = :farmer_id) as total_fields,
-            (SELECT COUNT(*) FROM alerts 
-             WHERE farmer_id = :farmer_id 
+            (SELECT COUNT(*) FROM "Fields" WHERE farmer_id = :farmer_id) as total_fields,
+            (SELECT COUNT(*) FROM "Alerts"
+             WHERE farmer_id = :farmer_id
              AND created_at >= CURRENT_DATE - INTERVAL '7 days') as pending_alerts,
-            (SELECT COUNT(*) FROM alerts 
+            (SELECT COUNT(*) FROM "Alerts"
              WHERE farmer_id = :farmer_id 
              AND DATE(created_at) = CURRENT_DATE) as alerts_today,
-            (SELECT MAX(date) FROM fertiliserusage 
+            (SELECT MAX(date) FROM "FertiliserUsage" 
              WHERE farmer_id = :farmer_id) as last_fert_date,
-            (SELECT COUNT(*) FROM weatherdata w
-             INNER JOIN fields f ON w.field_id = f.id
+            (SELECT COUNT(*) FROM "WeatherData" w
+             INNER JOIN "Fields" f ON w.field_id = f.id
              WHERE f.farmer_id = :farmer_id
              AND DATE(w.created_at) = CURRENT_DATE) as weather_today
     """)
@@ -357,7 +357,7 @@ async def get_welcome_message(
     
     query = text("""
         SELECT first_name, other_name, location
-        FROM users
+        FROM "Users"
         WHERE id = :farmer_id
     """)
     

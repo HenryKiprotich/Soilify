@@ -2,6 +2,17 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 
+class FieldOption(BaseModel):
+    """Schema for field dropdown options"""
+    id: int
+    field_name: str
+    soil_type: Optional[str] = None
+    crop_type: Optional[str] = None
+    size_hectares: Optional[float] = None
+
+    class Config:
+        from_attributes = True
+
 class FieldCreate(BaseModel):
     """Schema for creating a new field (farmer_id extracted from token)"""
     field_name: str
