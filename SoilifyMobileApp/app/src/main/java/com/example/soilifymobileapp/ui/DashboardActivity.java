@@ -32,7 +32,7 @@ public class DashboardActivity extends AppCompatActivity {
     private TextView textGreeting, textUserName, textLocation, textTotalFields, textPendingAlerts, textWeatherToday;
     private RecyclerView recyclerAlerts;
     private CardView layoutEmptyState;
-    private Button btnMyFields, btnFertilizerUsage, btnWeatherData, btnAlerts, btnAIAdvisor;
+    private Button btnMyFields, btnFertilizerUsage, btnWeatherData, btnAlerts, btnAnalytics, btnAIAdvisor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +52,7 @@ public class DashboardActivity extends AppCompatActivity {
         btnFertilizerUsage = findViewById(R.id.btnFertilizerUsage);
         btnWeatherData = findViewById(R.id.btnWeatherData);
         btnAlerts = findViewById(R.id.btnAlerts);
+        btnAnalytics = findViewById(R.id.btnAnalytics);
         btnAIAdvisor = findViewById(R.id.btnAIAdvisor);
 
         // Setup RecyclerView
@@ -62,16 +63,19 @@ public class DashboardActivity extends AppCompatActivity {
 
         // Button listeners
         btnMyFields.setOnClickListener(v -> {
-            startActivity(new Intent(DashboardActivity.this, AnalyticsActivity.class));
+            startActivity(new Intent(DashboardActivity.this, FieldsActivity.class));
         });
         btnFertilizerUsage.setOnClickListener(v -> {
             startActivity(new Intent(DashboardActivity.this, RecordFertiliserActivity.class));
         });
         btnWeatherData.setOnClickListener(v -> {
-            // There is no WeatherDataActivity yet, so this button does nothing.
+            startActivity(new Intent(DashboardActivity.this, WeatherDataActivity.class));
         });
         btnAlerts.setOnClickListener(v -> {
             startActivity(new Intent(DashboardActivity.this, AlertsActivity.class));
+        });
+        btnAnalytics.setOnClickListener(v -> {
+            startActivity(new Intent(DashboardActivity.this, AnalyticsActivity.class));
         });
         btnAIAdvisor.setOnClickListener(v -> {
             startActivity(new Intent(DashboardActivity.this, RecommendationsActivity.class));

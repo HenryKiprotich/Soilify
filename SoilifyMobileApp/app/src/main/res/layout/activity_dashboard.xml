@@ -213,6 +213,13 @@
                 android:text="Alerts" />
 
             <Button
+                android:id="@+id/btnAnalytics"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:text="Analytics" />
+
+            <Button
                 android:id="@+id/btnAIAdvisor"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

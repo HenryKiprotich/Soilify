@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -73,9 +74,9 @@ public class RecordFertiliserActivity extends AppCompatActivity {
     private void loadFertiliserUsage() {
         FertiliserApi fertiliserApi = ApiClient.getClient(this).create(FertiliserApi.class);
         Call<List<FertiliserUsageRead>> call = fertiliserApi.getAllFertiliserUsage();
-        call.enqueue(new Callback<List<FertiliserUsageRead>>() {
+        call.enqueue(new Callback<>() {
             @Override
-            public void onResponse(Call<List<FertiliserUsageRead>> call, Response<List<FertiliserUsageRead>> response) {
+            public void onResponse(@NonNull Call<List<FertiliserUsageRead>> call, @NonNull Response<List<FertiliserUsageRead>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     usageList.clear();
                     usageList.addAll(response.body());
@@ -86,7 +87,7 @@ public class RecordFertiliserActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<List<FertiliserUsageRead>> call, Throwable t) {
+            public void onFailure(@NonNull Call<List<FertiliserUsageRead>> call, @NonNull Throwable t) {
                 Toast.makeText(RecordFertiliserActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
             }
         });
@@ -95,9 +96,9 @@ public class RecordFertiliserActivity extends AppCompatActivity {
     private void loadFieldOptions() {
         FertiliserApi fertiliserApi = ApiClient.getClient(this).create(FertiliserApi.class);
         Call<List<FieldOption>> call = fertiliserApi.getFieldsForDropdown();
-        call.enqueue(new Callback<List<FieldOption>>() {
+        call.enqueue(new Callback<>() {
             @Override
-            public void onResponse(Call<List<FieldOption>> call, Response<List<FieldOption>> response) {
+            public void onResponse(@NonNull Call<List<FieldOption>> call, @NonNull Response<List<FieldOption>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     fieldOptions.clear();
                     fieldOptions.addAll(response.body());
@@ -105,7 +106,7 @@ public class RecordFertiliserActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<List<FieldOption>> call, Throwable t) {
+            public void onFailure(@NonNull Call<List<FieldOption>> call, @NonNull Throwable t) {
                 Toast.makeText(RecordFertiliserActivity.this, "Failed to load fields", Toast.LENGTH_SHORT).show();
             }
         });
@@ -184,9 +185,9 @@ public class RecordFertiliserActivity extends AppCompatActivity {
     private void createFertiliserUsage(FertiliserUsageCreate newUsage) {
         FertiliserApi fertiliserApi = ApiClient.getClient(this).create(FertiliserApi.class);
         Call<FertiliserUsageRead> call = fertiliserApi.createFertiliserUsage(newUsage);
-        call.enqueue(new Callback<FertiliserUsageRead>() {
+        call.enqueue(new Callback<>() {
             @Override
-            public void onResponse(Call<FertiliserUsageRead> call, Response<FertiliserUsageRead> response) {
+            public void onResponse(@NonNull Call<FertiliserUsageRead> call, @NonNull Response<FertiliserUsageRead> response) {
                 if (response.isSuccessful()) {
                     loadFertiliserUsage();
                     Toast.makeText(RecordFertiliserActivity.this, "Record created successfully", Toast.LENGTH_SHORT).show();
@@ -196,7 +197,7 @@ public class RecordFertiliserActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<FertiliserUsageRead> call, Throwable t) {
+            public void onFailure(@NonNull Call<FertiliserUsageRead> call, @NonNull Throwable t) {
                 Toast.makeText(RecordFertiliserActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
             }
         });
@@ -205,9 +206,9 @@ public class RecordFertiliserActivity extends AppCompatActivity {
     private void updateFertiliserUsage(int usageId, FertiliserUsageUpdate updatedUsage) {
         FertiliserApi fertiliserApi = ApiClient.getClient(this).create(FertiliserApi.class);
         Call<FertiliserUsageRead> call = fertiliserApi.updateFertiliserUsage(usageId, updatedUsage);
-        call.enqueue(new Callback<FertiliserUsageRead>() {
+        call.enqueue(new Callback<>() {
             @Override
-            public void onResponse(Call<FertiliserUsageRead> call, Response<FertiliserUsageRead> response) {
+            public void onResponse(@NonNull Call<FertiliserUsageRead> call, @NonNull Response<FertiliserUsageRead> response) {
                 if (response.isSuccessful()) {
                     loadFertiliserUsage();
                     Toast.makeText(RecordFertiliserActivity.this, "Record updated successfully", Toast.LENGTH_SHORT).show();
@@ -217,7 +218,7 @@ public class RecordFertiliserActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<FertiliserUsageRead> call, Throwable t) {
+            public void onFailure(@NonNull Call<FertiliserUsageRead> call, @NonNull Throwable t) {
                 Toast.makeText(RecordFertiliserActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
             }
         });
@@ -226,9 +227,9 @@ public class RecordFertiliserActivity extends AppCompatActivity {
     private void deleteFertiliserUsage(int usageId) {
         FertiliserApi fertiliserApi = ApiClient.getClient(this).create(FertiliserApi.class);
         Call<Void> call = fertiliserApi.deleteFertiliserUsage(usageId);
-        call.enqueue(new Callback<Void>() {
+        call.enqueue(new Callback<>() {
             @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 if (response.isSuccessful()) {
                     loadFertiliserUsage();
                     Toast.makeText(RecordFertiliserActivity.this, "Record deleted successfully", Toast.LENGTH_SHORT).show();
@@ -238,7 +239,7 @@ public class RecordFertiliserActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<Void> call, Throwable t) {
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
                 Toast.makeText(RecordFertiliserActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
             }
         });
