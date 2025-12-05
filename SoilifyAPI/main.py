@@ -20,7 +20,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Also configure uvicorn loggers to show access logs
+# Configure uvicorn loggers to show access logs
 logging.getLogger("uvicorn.access").setLevel(logging.INFO)
 logging.getLogger("uvicorn.error").setLevel(logging.INFO)
 
