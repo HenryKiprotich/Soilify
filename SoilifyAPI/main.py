@@ -46,9 +46,10 @@ app.add_middleware(
         "http://localhost:3000",      # React web (if any)
         "http://localhost:8081",      # Expo development
         "http://10.0.2.2:8000",       # Android emulator
+        "http://192.168.100.46:8000", # Your local network IP
         "*"                           # Allow all for development (restrict in production)
     ],
-    allow_credentials=True,
+    allow_credentials=False,          # Set to False when using "*" origin
     allow_methods=["*"],
     allow_headers=["*"],
 )

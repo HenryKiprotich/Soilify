@@ -78,7 +78,7 @@ public class DashboardActivity extends AppCompatActivity {
             startActivity(new Intent(DashboardActivity.this, AnalyticsActivity.class));
         });
         btnAIAdvisor.setOnClickListener(v -> {
-            startActivity(new Intent(DashboardActivity.this, RecommendationsActivity.class));
+            startActivity(new Intent(DashboardActivity.this, AIActivity.class));
         });
     }
 

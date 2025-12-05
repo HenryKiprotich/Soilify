@@ -8,9 +8,10 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.soilifymobileapp.R;
-import com.example.soilifymobileapp.models.Field;
+import com.example.soilifymobileapp.models.FieldRead;
+import com.example.soilifymobileapp.models.FieldUpdate;
 import com.example.soilifymobileapp.network.ApiClient;
-import com.example.soilifymobileapp.network.FieldApi;
+import com.example.soilifymobileapp.network.FieldsApi;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -46,14 +47,14 @@ public class EditFieldActivity extends AppCompatActivity {
     }
 
     private void loadFieldDetails() {
-        FieldApi apiService = ApiClient.getClient(this).create(FieldApi.class);
-        Call<Field> call = apiService.getField(fieldId);
+        FieldsApi apiService = ApiClient.getClient(this).create(FieldsApi.class);
+        Call<FieldRead> call = apiService.getField(fieldId);
 
-        call.enqueue(new Callback<Field>() {
+        call.enqueue(new Callback<FieldRead>() {
             @Override
-            public void onResponse(Call<Field> call, Response<Field> response) {
+            public void onResponse(Call<FieldRead> call, Response<FieldRead> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    Field field = response.body();
+                    FieldRead field = response.body();
                     editTextFieldName.setText(field.getFieldName());
                     editTextSoilType.setText(field.getSoilType());
                     editTextCropType.setText(field.getCropType());
@@ -64,7 +65,7 @@ public class EditFieldActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<Field> call, Throwable t) {
+            public void onFailure(Call<FieldRead> call, Throwable t) {
                 Toast.makeText(EditFieldActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -81,20 +82,16 @@ public class EditFieldActivity extends AppCompatActivity {
             return;
         }
 
-        double size = Double.parseDouble(sizeStr);
+        float size = Float.parseFloat(sizeStr);
 
-        Field field = new Field();
-        field.setFieldName(fieldName);
-        field.setSoilType(soilType);
-        field.setCropType(cropType);
-        field.setSizeHectares(size);
+        FieldUpdate fieldUpdate = new FieldUpdate(fieldName, soilType, cropType, size);
 
-        FieldApi apiService = ApiClient.getClient(this).create(FieldApi.class);
-        Call<Field> call = apiService.updateField(fieldId, field);
+        FieldsApi apiService = ApiClient.getClient(this).create(FieldsApi.class);
+        Call<FieldRead> call = apiService.updateField(fieldId, fieldUpdate);
 
-        call.enqueue(new Callback<Field>() {
+        call.enqueue(new Callback<FieldRead>() {
             @Override
-            public void onResponse(Call<Field> call, Response<Field> response) {
+            public void onResponse(Call<FieldRead> call, Response<FieldRead> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(EditFieldActivity.this, "Field updated successfully", Toast.LENGTH_SHORT).show();
                     finish(); // Go back to FieldsActivity
@@ -104,7 +101,7 @@ public class EditFieldActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<Field> call, Throwable t) {
+            public void onFailure(Call<FieldRead> call, Throwable t) {
                 Toast.makeText(EditFieldActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });

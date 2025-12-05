@@ -13,7 +13,7 @@ from sqlalchemy import text
 
 from app.database.database import get_db
 from app.services.auth_service import get_current_user_from_cookie
-from app.schemas.ai_recommendation_schema import (
+from app.schemas.ai_schema import (
     ChatRequest,
     ChatResponse,
     NLToSQLRequest,
@@ -206,7 +206,7 @@ async def get_conversation_history(
             return ConversationHistory(
                 session_id=session_id,
                 conversations=[],
-                total_count=0
+                total=0
             )
 
         # Build conversation list
@@ -224,7 +224,7 @@ async def get_conversation_history(
         return ConversationHistory(
             session_id=session_id,
             conversations=conversations,
-            total_count=len(conversations)
+            total=len(conversations)
         )
 
     except Exception as e:

@@ -114,7 +114,7 @@ async def get_farm_overview(
     activity_query = text("""
         SELECT 
             (SELECT MAX(date) FROM "FertiliserUsage" WHERE farmer_id = :farmer_id) as last_fert,
-            (SELECT MAX(created_at) FROM "WeatherData" w 
+            (SELECT MAX(w.created_at) FROM "WeatherData" w 
              INNER JOIN "Fields" f ON w.field_id = f.id 
              WHERE f.farmer_id = :farmer_id) as last_weather,
             (SELECT MAX(created_at) FROM "Alerts" WHERE farmer_id = :farmer_id) as last_alert

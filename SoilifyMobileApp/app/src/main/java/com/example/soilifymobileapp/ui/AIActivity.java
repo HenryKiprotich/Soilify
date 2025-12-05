@@ -10,12 +10,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.soilifymobileapp.R;
+import com.example.soilifymobileapp.models.AIConversation;
 import com.example.soilifymobileapp.models.ChatRequest;
 import com.example.soilifymobileapp.models.ChatResponse;
-import com.example.soilifymobileapp.models.Recommendation;
 import com.example.soilifymobileapp.network.AiApi;
 import com.example.soilifymobileapp.network.ApiClient;
-import com.example.soilifymobileapp.ui.adapters.RecommendationsAdapter;
+import com.example.soilifymobileapp.ui.adapters.AIConversationsAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,40 +24,41 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class RecommendationsActivity extends AppCompatActivity {
+public class AIActivity extends AppCompatActivity {
 
-    private RecommendationsAdapter adapter;
-    private final List<Recommendation> recommendationList = new ArrayList<>();
+    private AIConversationsAdapter adapter;
+    private final List<AIConversation> conversationList = new ArrayList<>();
     private EditText etChatMessage;
-    private RecyclerView rvRecommendations;
+    private RecyclerView rvConversations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recommendations);
+        setContentView(R.layout.activity_ai);
 
-        rvRecommendations = findViewById(R.id.rvRecommendations);
+        rvConversations = findViewById(R.id.rvConversations);
         etChatMessage = findViewById(R.id.etChatMessage);
         Button btnSendMessage = findViewById(R.id.btnSendMessage);
 
-        rvRecommendations.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new RecommendationsAdapter(this, recommendationList);
-        rvRecommendations.setAdapter(adapter);
+        rvConversations.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new AIConversationsAdapter(this, conversationList);
+        rvConversations.setAdapter(adapter);
 
         btnSendMessage.setOnClickListener(v -> {
             String message = etChatMessage.getText().toString().trim();
             if (!message.isEmpty()) {
-                getAiRecommendation(message);
+                getAiResponse(message);
             }
         });
     }
 
-    private void getAiRecommendation(String message) {
+    private void getAiResponse(String message) {
         AiApi aiApi = ApiClient.getClient(this).create(AiApi.class);
         ChatRequest chatRequest = new ChatRequest(message, null, null);
 
-        recommendationList.add(new Recommendation("You", message));
+        conversationList.add(new AIConversation("You", message));
         adapter.notifyDataSetChanged();
+        etChatMessage.setText("");
 
         Call<ChatResponse> call = aiApi.chatWithAi(chatRequest);
         call.enqueue(new Callback<ChatResponse>() {
@@ -65,20 +66,20 @@ public class RecommendationsActivity extends AppCompatActivity {
             public void onResponse(Call<ChatResponse> call, Response<ChatResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     String aiResponse = response.body().getResponse();
-                    recommendationList.add(new Recommendation("AI", aiResponse));
+                    conversationList.add(new AIConversation("AI", aiResponse));
                     adapter.notifyDataSetChanged();
                     // Smooth scroll to the last item
                     if (adapter.getItemCount() > 0) {
-                        rvRecommendations.smoothScrollToPosition(adapter.getItemCount() - 1);
+                        rvConversations.smoothScrollToPosition(adapter.getItemCount() - 1);
                     }
                 } else {
-                    Toast.makeText(RecommendationsActivity.this, "Failed to get recommendation", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AIActivity.this, "Failed to get response", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<ChatResponse> call, Throwable t) {
-                Toast.makeText(RecommendationsActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AIActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
             }
         });
     }

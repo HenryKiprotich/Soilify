@@ -7,22 +7,22 @@ public class WeatherSummary {
     private int totalRecords;
 
     @SerializedName("average_temperature")
-    private float averageTemperature;
+    private Float averageTemperature;  // Boxed to handle null
 
     @SerializedName("average_rainfall")
-    private float averageRainfall;
+    private Float averageRainfall;  // Boxed to handle null
 
     @SerializedName("average_soil_moisture")
-    private float averageSoilMoisture;
+    private Float averageSoilMoisture;  // Boxed to handle null
 
     @SerializedName("max_temperature")
-    private float maxTemperature;
+    private Float maxTemperature;  // Boxed to handle null
 
     @SerializedName("max_rainfall")
-    private float maxRainfall;
+    private Float maxRainfall;  // Boxed to handle null
 
     @SerializedName("min_temperature")
-    private float minTemperature;
+    private Float minTemperature;  // Boxed to handle null
 
     @SerializedName("fields_monitored")
     private int fieldsMonitored;
@@ -36,51 +36,51 @@ public class WeatherSummary {
         this.totalRecords = totalRecords;
     }
 
-    public float getAverageTemperature() {
+    public Float getAverageTemperature() {
         return averageTemperature;
     }
 
-    public void setAverageTemperature(float averageTemperature) {
+    public void setAverageTemperature(Float averageTemperature) {
         this.averageTemperature = averageTemperature;
     }
 
-    public float getAverageRainfall() {
+    public Float getAverageRainfall() {
         return averageRainfall;
     }
 
-    public void setAverageRainfall(float averageRainfall) {
+    public void setAverageRainfall(Float averageRainfall) {
         this.averageRainfall = averageRainfall;
     }
 
-    public float getAverageSoilMoisture() {
+    public Float getAverageSoilMoisture() {
         return averageSoilMoisture;
     }
 
-    public void setAverageSoilMoisture(float averageSoilMoisture) {
+    public void setAverageSoilMoisture(Float averageSoilMoisture) {
         this.averageSoilMoisture = averageSoilMoisture;
     }
 
-    public float getMaxTemperature() {
+    public Float getMaxTemperature() {
         return maxTemperature;
     }
 
-    public void setMaxTemperature(float maxTemperature) {
+    public void setMaxTemperature(Float maxTemperature) {
         this.maxTemperature = maxTemperature;
     }
 
-    public float getMaxRainfall() {
+    public Float getMaxRainfall() {
         return maxRainfall;
     }
 
-    public void setMaxRainfall(float maxRainfall) {
+    public void setMaxRainfall(Float maxRainfall) {
         this.maxRainfall = maxRainfall;
     }
 
-    public float getMinTemperature() {
+    public Float getMinTemperature() {
         return minTemperature;
     }
 
-    public void setMinTemperature(float minTemperature) {
+    public void setMinTemperature(Float minTemperature) {
         this.minTemperature = minTemperature;
     }
 

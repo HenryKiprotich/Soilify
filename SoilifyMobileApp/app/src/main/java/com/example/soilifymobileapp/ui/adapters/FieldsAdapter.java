@@ -3,7 +3,7 @@ package com.example.soilifymobileapp.ui.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -29,6 +29,11 @@ public class FieldsAdapter extends RecyclerView.Adapter<FieldsAdapter.FieldViewH
         this.listener = listener;
     }
 
+    public void setFields(List<FieldRead> fields) {
+        this.fields = fields;
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public FieldViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -49,16 +54,16 @@ public class FieldsAdapter extends RecyclerView.Adapter<FieldsAdapter.FieldViewH
 
     static class FieldViewHolder extends RecyclerView.ViewHolder {
         private TextView tvFieldName, tvSoilType, tvCropType, tvSize;
-        private ImageButton btnEdit, btnDelete;
+        private Button btnEdit, btnDelete;
 
         public FieldViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvFieldName = itemView.findViewById(R.id.tvFieldName);
-            tvSoilType = itemView.findViewById(R.id.tvSoilType);
-            tvCropType = itemView.findViewById(R.id.tvCropType);
-            tvSize = itemView.findViewById(R.id.tvSize);
-            btnEdit = itemView.findViewById(R.id.btnEdit);
-            btnDelete = itemView.findViewById(R.id.btnDelete);
+            tvFieldName = itemView.findViewById(R.id.textViewFieldName);
+            tvSoilType = itemView.findViewById(R.id.textViewSoilType);
+            tvCropType = itemView.findViewById(R.id.textViewCropType);
+            tvSize = itemView.findViewById(R.id.textViewSize);
+            btnEdit = itemView.findViewById(R.id.buttonEdit);
+            btnDelete = itemView.findViewById(R.id.buttonDelete);
         }
 
         public void bind(final FieldRead field, final OnItemClickListener listener) {

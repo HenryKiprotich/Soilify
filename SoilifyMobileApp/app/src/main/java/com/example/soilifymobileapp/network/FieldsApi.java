@@ -1,5 +1,6 @@
 package com.example.soilifymobileapp.network;
 
+import com.example.soilifymobileapp.models.Field;
 import com.example.soilifymobileapp.models.FieldCreate;
 import com.example.soilifymobileapp.models.FieldRead;
 import com.example.soilifymobileapp.models.FieldUpdate;
@@ -15,18 +16,19 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface FieldsApi {
-    @GET("fields")
+
+    @GET("api/fields")
     Call<List<FieldRead>> getAllFields();
 
-    @GET("fields/{field_id}")
+    @GET("api/fields/{field_id}")
     Call<FieldRead> getField(@Path("field_id") int fieldId);
 
-    @POST("fields")
+    @POST("api/fields")
     Call<FieldRead> createField(@Body FieldCreate field);
 
-    @PUT("fields/{field_id}")
-    Call<FieldRead> updateField(@Path("field_id") int fieldId, @Body FieldUpdate fieldUpdate);
+    @PUT("api/fields/{field_id}")
+    Call<FieldRead> updateField(@Path("field_id") int fieldId, @Body FieldUpdate field);
 
-    @DELETE("fields/{field_id}")
+    @DELETE("api/fields/{field_id}")
     Call<Void> deleteField(@Path("field_id") int fieldId);
 }

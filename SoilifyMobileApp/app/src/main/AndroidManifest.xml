@@ -15,7 +15,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SoilifyMobileApp"
-        android:usesCleartextTraffic="true"
         android:networkSecurityConfig="@xml/network_security_config">
         <activity
             android:name=".ui.LoginActivity"
@@ -32,8 +31,14 @@
         <activity android:name=".ui.DashboardActivity" />
         <activity android:name=".ui.RecordFertiliserActivity" />
         <activity android:name=".ui.AnalyticsActivity" />
-        <activity android:name=".ui.RecommendationsActivity" />
+        <activity android:name=".ui.AIActivity" />
         <activity android:name=".ui.AlertsActivity" />
+        <activity android:name=".ui.FieldsActivity" />
+        <activity android:name=".ui.WeatherDataActivity" />
+        <activity android:name=".ui.NewFieldActivity" />
+        <activity android:name=".ui.EditFieldActivity" />
+        <activity android:name=".ui.NewWeatherDataActivity" />
+        <activity android:name=".ui.EditWeatherDataActivity" />
     </application>
 
 </manifest>

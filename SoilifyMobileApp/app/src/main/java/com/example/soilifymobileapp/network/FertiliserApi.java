@@ -16,21 +16,21 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface FertiliserApi {
-    @GET("fertiliser-usage/fields-dropdown")
+    @GET("api/fertilizer-usage/fields-dropdown")
     Call<List<FieldOption>> getFieldsForDropdown();
 
-    @GET("fertiliser-usage")
+    @GET("api/fertilizer-usage")
     Call<List<FertiliserUsageRead>> getAllFertiliserUsage();
 
-    @GET("fertiliser-usage/{usage_id}")
+    @GET("api/fertilizer-usage/{usage_id}")
     Call<FertiliserUsageRead> getFertiliserUsage(@Path("usage_id") int usageId);
 
-    @POST("fertiliser-usage")
+    @POST("api/fertilizer-usage")
     Call<FertiliserUsageRead> createFertiliserUsage(@Body FertiliserUsageCreate usage);
 
-    @PUT("fertiliser-usage/{usage_id}")
+    @PUT("api/fertilizer-usage/{usage_id}")
     Call<FertiliserUsageRead> updateFertiliserUsage(@Path("usage_id") int usageId, @Body FertiliserUsageUpdate usageUpdate);
 
-    @DELETE("fertiliser-usage/{usage_id}")
+    @DELETE("api/fertilizer-usage/{usage_id}")
     Call<Void> deleteFertiliserUsage(@Path("usage_id") int usageId);
 }

@@ -12,6 +12,8 @@ public class ChatRequest {
     @SerializedName("context")
     private String context;
 
+    public ChatRequest() {}
+
     public ChatRequest(String message, String sessionId, String context) {
         this.message = message;
         this.sessionId = sessionId;
@@ -19,4 +21,27 @@ public class ChatRequest {
     }
 
     // Getters and Setters
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    public String getContext() {
+        return context;
+    }
+
+    public void setContext(String context) {
+        this.context = context;
+    }
 }

@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.soilifymobileapp.R;
 import com.example.soilifymobileapp.models.FarmOverview;
 import com.example.soilifymobileapp.models.FertilizerByType;
+import com.example.soilifymobileapp.models.FertilizerSummary;
 import com.example.soilifymobileapp.network.AnalyticsApi;
 import com.example.soilifymobileapp.network.ApiClient;
 import com.github.mikephil.charting.charts.BarChart;
@@ -78,22 +79,30 @@ public class AnalyticsActivity extends AppCompatActivity {
         farmOverviewCall.enqueue(new Callback<FarmOverview>() {
             @Override
             public void onResponse(Call<FarmOverview> call, Response<FarmOverview> response) {
-                if (response.isSuccessful()) {
+                if (response.isSuccessful() && response.body() != null) {
                     FarmOverview overview = response.body();
-                    if (overview != null) {
-                        String summary = "Total Fields: " + overview.getTotalFields() + "\n" +
-                                "Total Area: " + overview.getTotalAreaHectares() + " hectares\n" +
-                                "Most Used Fertilizer: " + overview.getFertilizerSummary().getMostUsedFertilizer();
-                        tvSummaryData.setText(summary);
+                    StringBuilder summary = new StringBuilder();
+                    summary.append("Total Fields: ").append(overview.getTotalFields()).append("\n");
+                    summary.append("Total Area: ").append(String.format("%.2f", overview.getTotalAreaHectares())).append(" hectares\n");
+                    
+                    FertilizerSummary fertSummary = overview.getFertilizerSummary();
+                    if (fertSummary != null) {
+                        String mostUsed = fertSummary.getMostUsedFertilizer();
+                        summary.append("Most Used Fertilizer: ").append(mostUsed != null ? mostUsed : "N/A").append("\n");
+                        summary.append("Total Applications: ").append(fertSummary.getTotalApplications()).append("\n");
+                        summary.append("Total Fertilizer: ").append(String.format("%.2f", fertSummary.getTotalAmountKg())).append(" kg");
+                    } else {
+                        summary.append("No fertilizer data available");
                     }
+                    tvSummaryData.setText(summary.toString());
                 } else {
-                    // Handle error
+                    tvSummaryData.setText("No summary data available");
                 }
             }
 
             @Override
             public void onFailure(Call<FarmOverview> call, Throwable t) {
-                // Handle exception
+                tvSummaryData.setText("Failed to load summary: " + t.getMessage());
             }
         });
 

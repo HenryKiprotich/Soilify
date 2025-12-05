@@ -12,12 +12,12 @@ import retrofit2.http.Query;
 
 public interface AlertsApi {
 
-    @GET("alerts/fields-dropdown")
+    @GET("api/alerts/fields-dropdown")
     Call<List<FieldOption>> getFieldsForDropdown();
 
-    @GET("alerts")
+    @GET("api/alerts")
     Call<List<AlertRead>> getAllAlerts(@Query("field_id") Integer fieldId, @Query("limit") Integer limit);
 
-    @GET("alerts/summary")
+    @GET("api/alerts/summary")
     Call<AlertSummary> getAlertsSummary();
 }

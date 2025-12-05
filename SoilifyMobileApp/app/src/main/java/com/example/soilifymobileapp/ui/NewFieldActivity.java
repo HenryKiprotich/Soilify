@@ -8,9 +8,10 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.soilifymobileapp.R;
-import com.example.soilifymobileapp.models.Field;
+import com.example.soilifymobileapp.models.FieldCreate;
+import com.example.soilifymobileapp.models.FieldRead;
 import com.example.soilifymobileapp.network.ApiClient;
-import com.example.soilifymobileapp.network.FieldApi;
+import com.example.soilifymobileapp.network.FieldsApi;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -48,18 +49,14 @@ public class NewFieldActivity extends AppCompatActivity {
 
         double size = Double.parseDouble(sizeStr);
 
-        Field field = new Field();
-        field.setFieldName(fieldName);
-        field.setSoilType(soilType);
-        field.setCropType(cropType);
-        field.setSizeHectares(size);
+        FieldCreate fieldCreate = new FieldCreate(fieldName, soilType, cropType, (float) size);
 
-        FieldApi apiService = ApiClient.getClient(this).create(FieldApi.class);
-        Call<Field> call = apiService.createField(field);
+        FieldsApi apiService = ApiClient.getClient(this).create(FieldsApi.class);
+        Call<FieldRead> call = apiService.createField(fieldCreate);
 
-        call.enqueue(new Callback<Field>() {
+        call.enqueue(new Callback<FieldRead>() {
             @Override
-            public void onResponse(Call<Field> call, Response<Field> response) {
+            public void onResponse(Call<FieldRead> call, Response<FieldRead> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(NewFieldActivity.this, "Field created successfully", Toast.LENGTH_SHORT).show();
                     finish(); // Go back to FieldsActivity
@@ -69,7 +66,7 @@ public class NewFieldActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<Field> call, Throwable t) {
+            public void onFailure(Call<FieldRead> call, Throwable t) {
                 Toast.makeText(NewFieldActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });

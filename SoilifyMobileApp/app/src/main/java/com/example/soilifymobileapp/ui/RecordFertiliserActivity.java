@@ -29,7 +29,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -80,7 +79,7 @@ public class RecordFertiliserActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     usageList.clear();
                     usageList.addAll(response.body());
-                    adapter.notifyDataSetChanged();
+                    adapter.setUsageList(usageList);
                 } else {
                     Toast.makeText(RecordFertiliserActivity.this, "Failed to load records", Toast.LENGTH_SHORT).show();
                 }
@@ -129,11 +128,20 @@ public class RecordFertiliserActivity extends AppCompatActivity {
         spField.setAdapter(fieldAdapter);
 
         final Calendar calendar = Calendar.getInstance();
-        if (usage != null) {
-            calendar.setTime(usage.getDate());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        
+        // Parse existing date if editing
+        if (usage != null && usage.getDate() != null) {
+            try {
+                java.util.Date parsedDate = dateFormat.parse(usage.getDate());
+                if (parsedDate != null) {
+                    calendar.setTime(parsedDate);
+                }
+            } catch (Exception e) {
+                // Use current date if parsing fails
+            }
         }
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
         btnSelectDate.setText(dateFormat.format(calendar.getTime()));
 
         btnSelectDate.setOnClickListener(v -> {
@@ -167,13 +175,13 @@ public class RecordFertiliserActivity extends AppCompatActivity {
             float amount = Float.parseFloat(etAmount.getText().toString().trim());
             String weather = etWeather.getText().toString().trim();
             String notes = etNotes.getText().toString().trim();
-            Date date = calendar.getTime();
+            String dateStr = dateFormat.format(calendar.getTime()); // Format as YYYY-MM-DD string
 
             if (usage == null) {
-                FertiliserUsageCreate newUsage = new FertiliserUsageCreate(selectedFieldId, fertiliserType, amount, weather, notes, date);
+                FertiliserUsageCreate newUsage = new FertiliserUsageCreate(selectedFieldId, fertiliserType, amount, weather, notes, dateStr);
                 createFertiliserUsage(newUsage);
             } else {
-                FertiliserUsageUpdate updatedUsage = new FertiliserUsageUpdate(selectedFieldId, fertiliserType, amount, weather, notes, date);
+                FertiliserUsageUpdate updatedUsage = new FertiliserUsageUpdate(selectedFieldId, fertiliserType, amount, weather, notes, dateStr);
                 updateFertiliserUsage(usage.getId(), updatedUsage);
             }
         });

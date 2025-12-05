@@ -14,12 +14,14 @@
         android:id="@+id/etFertiliserType"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:hint="Fertiliser Type" />
 
     <EditText
         android:id="@+id/etAmount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:hint="Amount (kg)"
         android:inputType="numberDecimal" />
 
@@ -27,18 +29,21 @@
         android:id="@+id/etWeather"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:hint="Weather" />
 
     <EditText
         android:id="@+id/etNotes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:hint="Notes" />
 
     <Button
         android:id="@+id/btnSelectDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:text="Select Date" />
 
 </LinearLayout>

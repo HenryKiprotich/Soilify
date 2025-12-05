@@ -3,7 +3,7 @@ package com.example.soilifymobileapp.ui.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -31,6 +31,11 @@ public class WeatherDataAdapter extends RecyclerView.Adapter<WeatherDataAdapter.
         this.listener = listener;
     }
 
+    public void setWeatherDataList(List<WeatherDataRead> weatherDataList) {
+        this.weatherDataList = weatherDataList;
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public WeatherDataViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -51,7 +56,7 @@ public class WeatherDataAdapter extends RecyclerView.Adapter<WeatherDataAdapter.
 
     static class WeatherDataViewHolder extends RecyclerView.ViewHolder {
         private TextView tvFieldName, tvTemperature, tvRainfall, tvSoilMoisture, tvDate;
-        private ImageButton btnEdit, btnDelete;
+        private Button btnEdit, btnDelete;
 
         public WeatherDataViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -66,12 +71,12 @@ public class WeatherDataAdapter extends RecyclerView.Adapter<WeatherDataAdapter.
 
         public void bind(final WeatherDataRead weatherData, final OnItemClickListener listener) {
             tvFieldName.setText(weatherData.getFieldName());
-            tvTemperature.setText("Temperature: " + weatherData.getTemperature() + "°C");
-            tvRainfall.setText("Rainfall: " + weatherData.getRainfall() + " mm");
-            tvSoilMoisture.setText("Soil Moisture: " + weatherData.getSoilMoisture() + "%");
+            tvTemperature.setText(String.format(Locale.getDefault(), "Temperature: %.1f°C", weatherData.getTemperature()));
+            tvRainfall.setText(String.format(Locale.getDefault(), "Rainfall: %.1fmm", weatherData.getRainfall()));
+            tvSoilMoisture.setText(String.format(Locale.getDefault(), "Soil Moisture: %.1f%%", weatherData.getSoilMoisture()));
 
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US);
-            tvDate.setText("Recorded on: " + dateFormat.format(weatherData.getCreatedAt()));
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+            tvDate.setText(sdf.format(weatherData.getCreatedAt()));
 
             btnEdit.setOnClickListener(v -> listener.onEditClick(weatherData));
             btnDelete.setOnClickListener(v -> listener.onDeleteClick(weatherData));

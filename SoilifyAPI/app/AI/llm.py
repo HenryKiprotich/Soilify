@@ -87,7 +87,7 @@ class LLMManager:
             # Get conversation history for context
             history_query = text("""
                 SELECT message, response 
-                FROM "AConversations"
+                FROM "AIConversations"
                 WHERE farmer_id = :farmer_id AND session_id = :session_id
                 ORDER BY created_at DESC 
                 LIMIT 5
