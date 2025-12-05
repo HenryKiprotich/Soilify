@@ -28,7 +28,7 @@ android {
                 "proguard-rules.pro"
             )
             // Define the production URL for the "release" version
-            buildConfigField("String", "BASE_URL", "\"https://api.yourdomain.com/\"")
+            buildConfigField("String", "BASE_URL", "\"https://soilifyapi.onrender.com/\"")
         }
 
         // 'debug' configuration
@@ -36,6 +36,13 @@ android {
             // This is automatically created, but we configure it here
             // Define the development/testing URL for the "debug" version
             buildConfigField("String", "BASE_URL", "\"http://192.168.100.46:8000/\"")
+        }
+
+        // 'staging' configuration for live tests
+        create("staging") {
+            initWith(getByName("debug"))
+            // Define the production URL for the "staging" version
+            buildConfigField("String", "BASE_URL", "\"https://soilifyapi.onrender.com/\"")
         }
     }
 

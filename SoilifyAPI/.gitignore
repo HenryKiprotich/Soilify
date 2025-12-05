@@ -9,10 +9,13 @@ venviron/
 env/
 ENV/
 .venv/
+venv/
+venv
 
 # Environment variables and secrets
 .env
 .env.*
+
 
 # Configuration (optional)
 config.py

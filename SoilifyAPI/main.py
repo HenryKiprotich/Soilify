@@ -145,11 +145,16 @@ async def shutdown_event():
 
 if __name__ == "__main__":
     import uvicorn
+    import os
+    
+    # Use PORT env variable for Render, default to 8000 for local dev
+    port = int(os.environ.get("PORT", 8000))
+    
     uvicorn.run(
         "main:app",
         host="0.0.0.0",
-        port=8000,
-        reload=True,
+        port=port,
+        reload=False,  # Disable reload in production
         log_level="info",
-        access_log=True  # Ensure access logs are enabled
+        access_log=True
     )
